@@ -5,6 +5,7 @@ describe('friendlyError', () => {
   it('rewrites technical messages', () => {
     expect(friendlyError('new row violates row-level security policy for table "events"')).toBe("You don't have permission to do that.");
     expect(friendlyError('TypeError: Failed to fetch')).toMatch(/connection/);
+    expect(friendlyError('The AI service could not be reached right now (429).')).toMatch(/used up for today/);
     expect(friendlyError('duplicate key value violates unique constraint "x_pkey"')).toMatch(/already/);
     expect(friendlyError('JWT expired')).toMatch(/sign in again/);
   });

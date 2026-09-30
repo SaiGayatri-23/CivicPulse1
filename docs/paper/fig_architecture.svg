@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="935" viewBox="0 45 1600 935" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<defs>
+<marker id="arr-sync" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/></marker>
+<marker id="arr-async" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/></marker>
+<marker id="arr-direct" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b45309"/></marker>
+</defs>
+<rect y="0" width="1600" height="980" fill="#ffffff"/>
+<rect x="20" y="60" width="220" height="740" rx="16" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+<rect x="20" y="60" width="220" height="6" rx="3" fill="#64748b"/>
+<text x="36" y="92" font-size="17" font-weight="700" fill="#334155" text-anchor="start">Users</text>
+<text x="36" y="112" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Browser or installed app</text>
+<rect x="265" y="60" width="530" height="740" rx="16" fill="#f5f9ff" stroke="#2563eb" stroke-width="2"/>
+<rect x="265" y="60" width="530" height="6" rx="3" fill="#2563eb"/>
+<text x="281" y="92" font-size="17" font-weight="700" fill="#1d4ed8" text-anchor="start">Client  ·  React 19 progressive web app</text>
+<text x="281" y="112" font-size="12" font-weight="400" fill="#475569" text-anchor="start">TypeScript  ·  Tailwind CSS  ·  Vite</text>
+<rect x="820" y="60" width="530" height="740" rx="16" fill="#f3fbf7" stroke="#059669" stroke-width="2"/>
+<rect x="820" y="60" width="530" height="6" rx="3" fill="#059669"/>
+<text x="836" y="92" font-size="17" font-weight="700" fill="#047857" text-anchor="start">Backend  ·  Supabase</text>
+<text x="836" y="112" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Managed PostgreSQL with auth, API and storage</text>
+<rect x="1375" y="60" width="205" height="740" rx="16" fill="#fffaf0" stroke="#d97706" stroke-width="2"/>
+<rect x="1375" y="60" width="205" height="6" rx="3" fill="#d97706"/>
+<text x="1391" y="92" font-size="17" font-weight="700" fill="#b45309" text-anchor="start">External services</text>
+<text x="1391" y="112" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Free-tier APIs</text>
+<rect x="38" y="140" width="184" height="86" rx="10" fill="#fff" stroke="#cbd5e1" stroke-width="1.4"/>
+<circle cx="130" cy="163" r="7" fill="none" stroke="#334155" stroke-width="2"/><path d="M 118 183 Q 130 167 142 183" fill="none" stroke="#334155" stroke-width="2"/>
+<text x="130" y="210" font-size="13.5" font-weight="600" fill="#0f172a" text-anchor="middle">Citizen / guest</text>
+<rect x="38" y="300" width="184" height="86" rx="10" fill="#fff" stroke="#cbd5e1" stroke-width="1.4"/>
+<rect x="119" y="318" width="22" height="24" fill="none" stroke="#334155" stroke-width="2"/><rect x="123" y="322" width="4" height="4" fill="#334155"/><rect x="123" y="330" width="4" height="4" fill="#334155"/><rect x="133" y="322" width="4" height="4" fill="#334155"/><rect x="133" y="330" width="4" height="4" fill="#334155"/>
+<text x="130" y="370" font-size="13.5" font-weight="600" fill="#0f172a" text-anchor="middle">Verified organisation</text>
+<rect x="38" y="470" width="184" height="86" rx="10" fill="#fff" stroke="#cbd5e1" stroke-width="1.4"/>
+<path d="M 130 487 L 141 492 L 141 501 Q 141 510 130 514 Q 119 510 119 501 L 119 492 Z" fill="none" stroke="#334155" stroke-width="2"/><path d="M 125 500 L 129 504 L 136 496" fill="none" stroke="#334155" stroke-width="2"/>
+<text x="130" y="540" font-size="13.5" font-weight="600" fill="#0f172a" text-anchor="middle">Administrator</text>
+<rect x="38" y="600" width="184" height="86" rx="10" fill="#fff" stroke="#cbd5e1" stroke-width="1.4"/>
+<path d="M 118 626 L 126 626 L 140 618 L 140 642 L 126 634 L 118 634 Z" fill="none" stroke="#334155" stroke-width="2"/><path d="M 124 634 L 127 643" stroke="#334155" stroke-width="2"/>
+<text x="130" y="670" font-size="13.5" font-weight="600" fill="#0f172a" text-anchor="middle">Advertiser</text>
+<rect x="280" y="128" width="500" height="250" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="290" y="146" font-size="10.5" font-weight="700" fill="#2563eb" text-anchor="start">CITIZEN EXPERIENCE</text>
+<rect x="292" y="156" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="368.0" y="183.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Feed, map</text>
+<text x="368.0" y="200.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">and search</text>
+<rect x="453" y="156" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="529.0" y="183.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Report</text>
+<text x="529.0" y="200.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">+ AI assist</text>
+<rect x="614" y="156" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="690.0" y="183.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Report detail,</text>
+<text x="690.0" y="200.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">timeline, replies</text>
+<rect x="292" y="228" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="368.0" y="255.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Events and</text>
+<text x="368.0" y="272.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">petitions</text>
+<rect x="453" y="228" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="529.0" y="255.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Utilities</text>
+<text x="529.0" y="272.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">and buses</text>
+<rect x="614" y="228" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="690.0" y="255.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Profile and</text>
+<text x="690.0" y="272.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">verification</text>
+<rect x="292" y="300" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="368.0" y="327.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">SOS and</text>
+<text x="368.0" y="344.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">child alerts</text>
+<rect x="453" y="300" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="529.0" y="327.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Missions</text>
+<text x="529.0" y="344.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">and points</text>
+<rect x="614" y="300" width="152" height="62" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="690.0" y="327.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Help and</text>
+<text x="690.0" y="344.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">feedback</text>
+<rect x="280" y="392" width="500" height="96" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="290" y="410" font-size="10.5" font-weight="700" fill="#2563eb" text-anchor="start">STAFF AND PARTNERS</text>
+<rect x="292" y="418" width="232" height="58" rx="8" fill="#fff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="408.0" y="443.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Admin console</text>
+<text x="408.0" y="460.05" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">work, safety, content, money, oversight</text>
+<rect x="536" y="418" width="232" height="58" rx="8" fill="#fff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="652.0" y="443.05" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Advertiser campaigns</text>
+<text x="652.0" y="460.05" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">draft, review, stats, spend</text>
+<rect x="280" y="502" width="500" height="284" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="290" y="520" font-size="10.5" font-weight="700" fill="#2563eb" text-anchor="start">IN-BROWSER PLATFORM</text>
+<rect x="292" y="530" width="232" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="408.0" y="559.55" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">TanStack Query cache</text>
+<rect x="536" y="530" width="232" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="652.0" y="559.55" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">React Router</text>
+<rect x="292" y="592" width="232" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="408.0" y="621.55" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">i18n: 23 languages, RTL</text>
+<rect x="536" y="592" width="232" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="652.0" y="621.55" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Leaflet maps, exifr GPS</text>
+<rect x="292" y="654" width="232" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="408.0" y="683.55" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Workbox service worker</text>
+<rect x="536" y="654" width="232" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="652.0" y="683.55" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">IndexedDB offline outbox</text>
+<rect x="292" y="716" width="232" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="408.0" y="745.55" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Web Push subscription</text>
+<rect x="536" y="716" width="232" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.4"/>
+<text x="652.0" y="745.55" font-size="13" font-weight="500" fill="#0f172a" text-anchor="middle">Turnstile CAPTCHA widget</text>
+<rect x="836" y="138" width="170" height="96" rx="8" fill="#ffffff" stroke="#6ee7b7" stroke-width="1.4"/>
+<text x="921.0" y="181.75" font-size="15" font-weight="700" fill="#0f172a" text-anchor="middle">Auth</text>
+<text x="921.0" y="200.75" font-size="13" font-weight="400" fill="#475569" text-anchor="middle">email, guest, Google</text>
+<rect x="836" y="262" width="170" height="96" rx="8" fill="#ffffff" stroke="#6ee7b7" stroke-width="1.4"/>
+<text x="921.0" y="305.75" font-size="15" font-weight="700" fill="#0f172a" text-anchor="middle">REST API</text>
+<text x="921.0" y="324.75" font-size="13" font-weight="400" fill="#475569" text-anchor="middle">PostgREST: tables + RPC</text>
+<rect x="836" y="386" width="170" height="96" rx="8" fill="#ffffff" stroke="#6ee7b7" stroke-width="1.4"/>
+<text x="921.0" y="429.75" font-size="15" font-weight="700" fill="#0f172a" text-anchor="middle">Storage</text>
+<text x="921.0" y="448.75" font-size="13" font-weight="400" fill="#475569" text-anchor="middle">photos, videos, ads, docs</text>
+<rect x="1024" y="128" width="312" height="658" rx="12" fill="#ffffff" stroke="#059669" stroke-width="1.8"/>
+<text x="1038" y="152" font-size="16" font-weight="700" fill="#047857" text-anchor="start">PostgreSQL</text>
+<text x="1038" y="170" font-size="11.5" font-weight="400" fill="#475569" text-anchor="start">44 tables · 109 functions · 53 triggers · 124 policies</text>
+<rect x="1034" y="184" width="292" height="130" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#059669" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="1044" y="202" font-size="10.5" font-weight="700" fill="#059669" text-anchor="start">SECURITY</text>
+<rect x="1044" y="210" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1111.0" y="234.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">Row-level security</text>
+<rect x="1186" y="210" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1253.0" y="234.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">Column grants</text>
+<rect x="1044" y="260" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1111.0" y="284.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">pgcrypto encryption</text>
+<rect x="1186" y="260" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1253.0" y="284.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">Vault secrets</text>
+<rect x="1034" y="336" width="292" height="130" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#059669" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="1044" y="354" font-size="10.5" font-weight="700" fill="#059669" text-anchor="start">BUSINESS LOGIC</text>
+<rect x="1044" y="362" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1111.0" y="386.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">Lifecycle triggers</text>
+<rect x="1186" y="362" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1253.0" y="386.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">Dedupe and limits</text>
+<rect x="1044" y="412" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1111.0" y="436.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">RPC: AI, admin</text>
+<rect x="1186" y="412" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1253.0" y="436.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">Points, notify</text>
+<rect x="1034" y="488" width="292" height="80" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#059669" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="1044" y="506" font-size="10.5" font-weight="700" fill="#059669" text-anchor="start">INTEGRATIONS</text>
+<rect x="1044" y="514" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1111.0" y="538.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">http  (sync)</text>
+<rect x="1186" y="514" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1253.0" y="538.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">pg_net  (async)</text>
+<rect x="1034" y="592" width="292" height="130" rx="10" fill="#ffffff" fill-opacity="0.7" stroke="#059669" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="1044" y="610" font-size="10.5" font-weight="700" fill="#059669" text-anchor="start">OPERATIONS</text>
+<rect x="1044" y="618" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1111.0" y="642.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">pg_cron purge</text>
+<rect x="1186" y="618" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1253.0" y="642.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">pg_trgm search</text>
+<rect x="1044" y="668" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1111.0" y="692.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">Audit log</text>
+<rect x="1186" y="668" width="134" height="40" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.4"/>
+<text x="1253.0" y="692.375" font-size="12.5" font-weight="500" fill="#0f172a" text-anchor="middle">Error log</text>
+<text x="1180.0" y="758" font-size="11.5" font-weight="400" fill="#475569" text-anchor="middle" font-style="italic">Rules run inside the database, so they hold</text>
+<text x="1180.0" y="774" font-size="11.5" font-weight="400" fill="#475569" text-anchor="middle" font-style="italic">even if the client is bypassed.</text>
+<rect x="1390" y="128" width="175" height="80" rx="8" fill="#ffffff" stroke="#fcd34d" stroke-width="1.4"/>
+<text x="1477.5" y="163.9" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">Resend</text>
+<text x="1477.5" y="181.9" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">email alerts</text>
+<rect x="1390" y="228" width="175" height="80" rx="8" fill="#ffffff" stroke="#fcd34d" stroke-width="1.4"/>
+<text x="1477.5" y="263.9" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">Web Push</text>
+<text x="1477.5" y="281.9" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">browser push services</text>
+<rect x="1390" y="328" width="175" height="80" rx="8" fill="#ffffff" stroke="#fcd34d" stroke-width="1.4"/>
+<text x="1477.5" y="363.9" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">Google Gemini</text>
+<text x="1477.5" y="381.9" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">AI suggestions</text>
+<rect x="1390" y="470" width="175" height="80" rx="8" fill="#ffffff" stroke="#fcd34d" stroke-width="1.4"/>
+<text x="1477.5" y="505.9" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">OpenStreetMap</text>
+<text x="1477.5" y="523.9" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">tiles, Nominatim, Overpass</text>
+<rect x="1390" y="570" width="175" height="80" rx="8" fill="#ffffff" stroke="#fcd34d" stroke-width="1.4"/>
+<text x="1477.5" y="605.9" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">Open-Meteo</text>
+<text x="1477.5" y="623.9" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">weather and air quality</text>
+<rect x="1390" y="670" width="175" height="80" rx="8" fill="#ffffff" stroke="#fcd34d" stroke-width="1.4"/>
+<text x="1477.5" y="705.9" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">Cloudflare Turnstile</text>
+<text x="1477.5" y="723.9" font-size="12" font-weight="400" fill="#475569" text-anchor="middle">bot protection</text>
+<path d="M 222 183 L 292 183" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<path d="M 222 343 L 250 343 L 250 250 L 292 250" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<path d="M 222 513 L 250 513 L 250 447 L 292 447" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<path d="M 222 643 L 256 643 L 256 460 L 292 460" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<circle cx="257" cy="183" r="11" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+<text x="257" y="187.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<path d="M 780 186 L 836 186" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<circle cx="808" cy="186" r="11" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+<text x="808" y="190.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<path d="M 780 300 L 836 300" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<circle cx="808" cy="300" r="11" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+<text x="808" y="304.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+<path d="M 780 424 L 836 424" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<circle cx="808" cy="424" r="11" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+<text x="808" y="428.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+<path d="M 1006 186 L 1024 186" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<path d="M 1006 310 L 1024 310" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<circle cx="1015" cy="350" r="11" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+<text x="1015" y="354.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+<path d="M 1006 434 L 1024 434" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<path d="M 1320 534 L 1350 534 L 1350 168 L 1390 168" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arr-async)"/>
+<path d="M 1350 268 L 1390 268" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arr-async)"/>
+<circle cx="1350" cy="410" r="11" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+<text x="1350" y="414.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">7</text>
+<path d="M 1111 554 L 1111 578 L 1366 578 L 1366 368 L 1390 368" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<circle cx="1366" cy="470" r="11" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+<text x="1366" y="474.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+<path d="M 530 786 L 530 814 L 1372 814 L 1372 510 L 1390 510" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#arr-direct)"/>
+<path d="M 1372 610 L 1390 610" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#arr-direct)"/>
+<path d="M 1372 710 L 1390 710" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#arr-direct)"/>
+<rect x="674.47" y="802.5" width="291.06" height="18.5" rx="4" fill="#ffffff"/>
+<text x="820" y="815" font-size="11.5" font-weight="500" fill="#475569" text-anchor="middle">direct from the browser: maps, weather, CAPTCHA</text>
+<rect x="20" y="850" width="1560" height="112" rx="12" fill="#f8fafc" stroke="#e2e8f0"/>
+<text x="40" y="876" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">Legend</text>
+<path d="M 40 896 L 95 896" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arr-sync)"/>
+<text x="106" y="900" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Synchronous request</text>
+<path d="M 40 918 L 95 918" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arr-async)"/>
+<text x="106" y="922" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Background (asynchronous)</text>
+<path d="M 40 940 L 95 940" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#arr-direct)"/>
+<text x="106" y="944" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Direct from the browser</text>
+<text x="360" y="876" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">Reporting a problem, step by step</text>
+<circle cx="368" cy="896" r="8" fill="#dc2626"/>
+<text x="368" y="900" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<text x="384" y="900" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Citizen or guest fills in the report in the app</text>
+<circle cx="368" cy="918" r="8" fill="#dc2626"/>
+<text x="368" y="922" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<text x="384" y="922" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Signs in, or a guest session is created</text>
+<circle cx="368" cy="940" r="8" fill="#dc2626"/>
+<text x="368" y="944" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+<text x="384" y="944" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Photos and video upload to storage</text>
+<circle cx="778" cy="896" r="8" fill="#dc2626"/>
+<text x="778" y="900" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+<text x="794" y="900" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Report is inserted through the REST API</text>
+<circle cx="778" cy="918" r="8" fill="#dc2626"/>
+<text x="778" y="922" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+<text x="794" y="922" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Triggers check access, duplicates, limits and priority</text>
+<circle cx="1188" cy="896" r="8" fill="#dc2626"/>
+<text x="1188" y="900" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+<text x="1204" y="900" font-size="12" font-weight="400" fill="#475569" text-anchor="start">AI suggestions: auto-fill, duplicate check, routing</text>
+<circle cx="1188" cy="918" r="8" fill="#dc2626"/>
+<text x="1188" y="922" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">7</text>
+<text x="1204" y="922" font-size="12" font-weight="400" fill="#475569" text-anchor="start">Followers are notified by email and web push</text>
+</svg>

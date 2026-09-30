@@ -5,8 +5,8 @@ import { useT, type TKey } from '../lib/i18n';
 import { Link } from 'react-router-dom';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Bus as BusIcon, ChevronRight, CreditCard, Grid3x3, LayoutGrid, Map as MapIcon, Megaphone, Rows3, Search, Target, Trophy, X, type LucideIcon } from 'lucide-react';
-import { AmberAlerts } from '../components/AmberAlerts';
-import { CityAlerts } from '../components/CityAlerts';
+import { AmberAlerts, useChildAlerts } from '../components/AmberAlerts';
+import { CityAlerts, useActiveAlerts } from '../components/CityAlerts';
 import { FeedActionsProvider } from '../components/CardActions';
 import { ContributionsFeed } from '../components/Contributions';
 import { ForYouCard, PetitionsCard, RecentlyFixed, TrendingCard, WeatherCard, WeekStrip, useDashboard } from '../components/DashboardWidgets';
@@ -318,6 +318,11 @@ export function Feed() {
   const rate = s && s.total > 0 ? Math.round((s.resolved / s.total) * 100) : 0;
   const hour = new Date().getHours();
   const greeting = t(hour < 12 ? 'greet.morning' : hour < 17 ? 'greet.afternoon' : 'greet.evening');
+  // Safety alerts sit above everything, so if they arrived after the rest of the page they would push it all
+  // down by several hundred pixels. Wait for both alert queries (one quick request each) before laying out.
+  const childAlerts = useChildAlerts();
+  const cityAlerts = useActiveAlerts();
+  if (childAlerts.isPending || cityAlerts.isPending) return <FeedSkeleton view={view} />;
 
   return (
     <FeedActionsProvider ids={list.map((i) => i.id)}>

@@ -1,6 +1,8 @@
 // Turns technical database, auth and network messages into plain language.
 // Messages the app raises on purpose are already readable and pass through unchanged.
 const RULES: [RegExp, string][] = [
+  // Gemini's free tier allows a fixed number of AI requests per day; the AI functions pass its 429 through.
+  [/\(429\)|resource_exhausted|quota exceeded/i, 'AI help is used up for today. Please fill this in yourself.'],
   [/failed to fetch|networkerror|load failed|network request failed/i, "Can't reach the server. Check your connection and try again."],
   [/jwt expired|invalid jwt|refresh token|session.*(missing|expired)/i, 'Your session has expired. Please sign in again.'],
   [/invalid login credentials/i, 'Email or password is incorrect.'],

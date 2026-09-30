@@ -16,8 +16,8 @@ const when = (iso: string) => new Date(iso).toLocaleString('en-IN', { day: 'nume
 const tel = (n: string) => `tel:${n.replace(/[^+0-9]/g, '')}`;
 
 // Missing-child alerts appear on every page, above everything else, until they close.
-export function AmberAlerts() {
-  const alerts = useQuery({
+export function useChildAlerts() {
+  return useQuery({
     queryKey: ['child-alerts'],
     refetchInterval: 2 * 60_000,
     queryFn: async () => {
@@ -28,6 +28,10 @@ export function AmberAlerts() {
       return data as ChildAlert[];
     },
   });
+}
+
+export function AmberAlerts() {
+  const alerts = useChildAlerts();
   if (!alerts.data?.length) return null;
   return <div className="space-y-2">{alerts.data.map((a) => <AlertCard key={a.id} a={a} />)}</div>;
 }

@@ -370,7 +370,7 @@ function AiSuggestDept({ issueId, onUse }: { issueId: string; onUse: (dept: stri
     setLoading(false);
     if (error) { setState({ error: friendlyError(error.message) }); return; }
     const r = data as { ok: boolean; department?: string; confidence?: string; reason?: string; cached?: boolean; error?: string };
-    setState(r.ok && r.department ? { department: r.department, confidence: r.confidence, reason: r.reason, cached: r.cached } : { error: r.error ?? 'Could not get a suggestion.' });
+    setState(r.ok && r.department ? { department: r.department, confidence: r.confidence, reason: r.reason, cached: r.cached } : { error: friendlyError(r.error ?? 'Could not get a suggestion.') });
   }
 
   if (!state) {
