@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Keep the big dashboard query private and add each map pin's area for the hotspot list.
 alter function public.admin_dashboard(integer, text, text, date, date) rename to admin_dashboard_core;
 alter function public.admin_dashboard_core(integer, text, text, date, date) set schema private;

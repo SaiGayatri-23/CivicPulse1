@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Encrypt the masked-Aadhaar last-4-digits at rest, the same way reporter contact details already
 -- are. The plaintext column stays only as the insert channel; a trigger moves the value into
 -- encrypted storage and blanks the plaintext before the row is ever written to disk.

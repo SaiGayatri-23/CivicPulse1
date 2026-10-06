@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Moderation (hide content, abuse flags), bans, admin user management, audit log, canned replies,
 -- editing/deleting your own content, and account deletion/export (DPDP data rights).
 

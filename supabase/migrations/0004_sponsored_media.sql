@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Sponsored posts can carry a looping GIF or a short video so they read as an advertisement.
 alter table public.sponsored_posts
   add column media_path text check (media_path is null or char_length(media_path) <= 300),

@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Ticket figures for the dashboard, now including how many tickets an admin is working on.
 create or replace function public.admin_overview() returns jsonb
 language plpgsql stable security definer set search_path = '' as $$

@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- The department-routing Gemini call used an 8s HTTP timeout while the working photo-autofill call
 -- (same model, same API, see 0046) uses 15s. LLM structured-output calls routinely take longer than
 -- 8s, which is why this one was intermittently returning "AI service could not be reached (503)"

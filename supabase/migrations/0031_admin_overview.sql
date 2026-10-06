@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- One call for the admin Overview page: work waiting in each queue, plus recent admin activity.
 create or replace function public.admin_overview() returns jsonb
 language plpgsql stable security definer set search_path = '' as $$

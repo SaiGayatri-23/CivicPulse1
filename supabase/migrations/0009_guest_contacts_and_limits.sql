@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Reporting without an account now requires a name, email and phone number. They are kept private
 -- (admins only), and the report can still be shown anonymously. They also drive the anti-spam limit:
 -- 3 reports per rolling 30 days per email, phone number or device, plus a per-network cap.

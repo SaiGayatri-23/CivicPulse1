@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Guest reporting: people can report without creating an account. The app signs them in with a
 -- Supabase anonymous session in the background; they can add an email later to keep their reports.
 -- Guests get tighter limits because creating a guest session costs an attacker nothing.

@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Feed extras: locality ("area") on reports for the area filter, short video clips on reports,
 -- category counts for the filter circles, and the list of areas that have reports.
 

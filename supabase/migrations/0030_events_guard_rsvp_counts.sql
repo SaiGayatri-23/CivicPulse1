@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- events_guard froze rsvp_count on every non-admin UPDATE, including the nested
 -- update from rsvps_after_change, so RSVPs never moved the count.
 create or replace function public.events_guard() returns trigger language plpgsql security definer set search_path = '' as $function$

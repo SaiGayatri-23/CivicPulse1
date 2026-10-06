@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Push hardening: the database no longer sends the VAPID private key over the network.
 -- The trigger posts only the notification id plus a shared secret. The send-push function then
 -- asks push_job() for the keys, subscriptions and message, using the service role, which only

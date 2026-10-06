@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- "Near me" with a radius (1, 3, 5 km or the whole city). Public reports only.
 drop function if exists public.issues_near(double precision, double precision, integer);
 

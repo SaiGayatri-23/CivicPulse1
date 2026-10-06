@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Every report must have a photo. Enforced server-side (not just in the form), and a report's photo
 -- can never be cleared once set. Two of the three existing photo-less test reports are backfilled
 -- with the matching sample image already shipped in web/public/samples; the third (a "stray dogs"

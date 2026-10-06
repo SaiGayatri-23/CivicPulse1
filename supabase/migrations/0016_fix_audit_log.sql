@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Two audit-log bugs found by end-to-end API tests:
 -- 1. audit_row() logged every change to admin-managed tables, including automatic counter updates
 --    caused by citizens (an RSVP updates events.rsvp_count), so citizens appeared as admin actors.

@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Trigger functions are internal. Nobody should be able to call them through the API.
 -- is_admin() stays callable because row-level security policies run it as the signed-in user.
 revoke execute on function

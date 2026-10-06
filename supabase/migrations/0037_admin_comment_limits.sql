@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Admins reply to citizens as staff, often several times on one report, so the anti-spam
 -- comment limits (3 per report, 30 per day) apply to everyone except admins.
 create or replace function public.comments_before_insert() returns trigger

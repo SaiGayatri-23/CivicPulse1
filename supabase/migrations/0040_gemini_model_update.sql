@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- gemini-2.0-flash (used in 0039) was retired on 1 June 2026 and now returns 404. Point at the
 -- current free-tier model, and make the model name overridable via Vault so a future rename
 -- doesn't need a migration — just:

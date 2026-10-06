@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Bus routes managed by CivicPulse admins (or a TGSRTC data partner), because TGSRTC publishes no open
 -- route or live-arrival feed and OpenStreetMap maps only a handful of Hyderabad routes.
 -- Times are the published schedule (first bus, last bus, frequency), not live positions.

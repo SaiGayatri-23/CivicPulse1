@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- 1. Stop duplicate reports.  2. Let admins merge duplicates.  3. One admin works a ticket at a time.
 
 ------------------------------------------------------------------------------------------------

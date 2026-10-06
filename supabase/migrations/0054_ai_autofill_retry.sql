@@ -1,20 +1,43 @@
 set check_function_bodies = off;
--- AI auto-fill for the report form: reads an uploaded photo and suggests a category, title and
--- description. The citizen still reviews and can edit everything before submitting — this only
--- fills the boxes, it never submits a report itself.
---
--- Citizens (including guests) can trigger this, unlike the admin-only department suggester, so it
--- needs its own usage log and its own, tighter caps to protect the shared free Gemini quota.
-create table public.ai_usage_log (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references public.profiles (id) on delete set null,
-  kind text not null,
-  created_at timestamptz not null default now()
-);
-create index ai_usage_log_kind_created_idx on public.ai_usage_log (kind, created_at);
-alter table public.ai_usage_log enable row level security;
--- No policies at all: nobody reads or writes this table directly, only the function below (as owner).
-revoke insert, update, delete, select on public.ai_usage_log from authenticated, anon;
+-- The photo auto-fill call to Gemini fails outright whenever Google answers 503 ("model
+-- overloaded"), which the free tier does intermittently for a few seconds at a time. The key and
+-- model are fine; the request simply needs to be retried. Add a shared Gemini caller that retries
+-- 429/5xx responses with a short pause inside the 8s statement_timeout that PostgREST calls get,
+-- and use it from suggest_report_details.
+create or replace function private.gemini_generate(p_body jsonb, p_budget_ms integer default 7000)
+returns extensions.http_response
+language plpgsql security definer set search_path = '' as $$
+declare
+  resp extensions.http_response;
+  attempt integer := 0;
+  started timestamptz := clock_timestamp();
+  remaining_ms integer;
+begin
+  -- PostgREST runs RPCs as "authenticated", whose statement_timeout is 8s, so the whole call
+  -- (every attempt plus the pauses between them) must fit inside p_budget_ms, not just one attempt.
+  loop
+    attempt := attempt + 1;
+    remaining_ms := p_budget_ms - (extract(epoch from clock_timestamp() - started) * 1000)::integer;
+    exit when remaining_ms < 1000;
+    perform extensions.http_set_curlopt('CURLOPT_TIMEOUT_MS', remaining_ms::text);
+    resp := extensions.http((
+      'POST', 'https://generativelanguage.googleapis.com/v1beta/models/' || private.gemini_model() || ':generateContent',
+      array[extensions.http_header('x-goog-api-key', private.gemini_key())]::extensions.http_header[],
+      'application/json',
+      p_body::text
+    )::extensions.http_request);
+    -- 429 = rate limited, 500/502/503/504 = Google-side hiccup (usually answered within a second,
+    -- so a short pause and a second try normally succeeds). Anything else is final.
+    exit when resp.status not in (429, 500, 502, 503, 504) or attempt >= 3;
+    perform pg_sleep(0.4 * attempt);
+  end loop;
+  if resp is null then
+    raise exception 'The AI service took too long to answer. Please try again.';
+  end if;
+  return resp;
+end;
+$$;
+revoke all on function private.gemini_generate(jsonb, integer) from public, anon, authenticated;
 
 create or replace function public.suggest_report_details(p_image_base64 text, p_mime text, p_hint text default null)
 returns jsonb
@@ -35,8 +58,6 @@ begin
   if me is null then raise exception 'Please try again in a moment.'; end if;
   if public.is_banned() then raise exception 'Your account cannot use this right now.'; end if;
   if p_mime not in ('image/jpeg', 'image/png', 'image/webp') then raise exception 'Unsupported image type.'; end if;
-  -- Roughly 1.5 MB of actual image data (base64 is ~4/3 the raw size); the client sends a
-  -- downsized copy just for this, well under that, so a hit here means something is wrong upstream.
   if char_length(p_image_base64) > 2_000_000 then raise exception 'That image is too large for a suggestion. Try a different photo.'; end if;
 
   select count(*) into user_count from public.ai_usage_log where kind = 'report_autofill' and user_id = me and created_at >= since;
@@ -53,12 +74,7 @@ begin
 
   insert into public.ai_usage_log (user_id, kind) values (me, 'report_autofill');
 
-  perform extensions.http_set_curlopt('CURLOPT_TIMEOUT_MS', '15000');
-  resp := extensions.http((
-    'POST', 'https://generativelanguage.googleapis.com/v1beta/models/' || private.gemini_model() || ':generateContent',
-    array[extensions.http_header('x-goog-api-key', key)]::extensions.http_header[],
-    'application/json',
-    jsonb_build_object(
+  resp := private.gemini_generate(jsonb_build_object(
       'contents', jsonb_build_array(jsonb_build_object('parts', jsonb_build_array(
         jsonb_build_object('inlineData', jsonb_build_object('mimeType', p_mime, 'data', p_image_base64)),
         jsonb_build_object('text',
@@ -84,10 +100,11 @@ begin
           'required', jsonb_build_array('category', 'title', 'description', 'looks_like_a_problem')
         )
       )
-    )::text
-  )::extensions.http_request);
+    ), 7000);
 
-  if resp.status <> 200 then
+  if resp.status in (429, 503) then
+    return jsonb_build_object('ok', false, 'error', 'The AI service is busy right now (' || resp.status || '). Please wait a few seconds and try again.');
+  elsif resp.status <> 200 then
     return jsonb_build_object('ok', false, 'error', 'The AI service could not be reached right now (' || resp.status || ').');
   end if;
 

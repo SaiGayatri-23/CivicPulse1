@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Field-level encryption for contact details of reports made without an account.
 -- Name, email and phone are stored encrypted (pgcrypto, AES via OpenPGP symmetric encryption) with a
 -- data key held in Supabase Vault. Spam limits match on salted one-way hashes, so the plain values

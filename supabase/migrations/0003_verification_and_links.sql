@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Verification by manual ID review, plus the official payment portal links.
 -- Aadhaar is deliberately not an accepted document type. The uploaded file lives in a private
 -- bucket and is deleted as soon as an admin decides; only "verified, how, when" is kept.

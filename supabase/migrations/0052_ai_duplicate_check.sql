@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- AI duplicate-report assist: when a citizen is drafting a report and there are several open
 -- reports nearby (same category, within 250m — see nearby_open_issues), it's tedious to read each
 -- one to see which, if any, is the same problem. This ranks the candidates the client already has

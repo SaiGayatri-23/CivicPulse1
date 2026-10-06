@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- AI department-routing suggestion for new reports, using Google's free-tier Gemini API.
 -- Admins click "Suggest department"; the model never assigns anything itself — an admin still
 -- has to press "Use this". The suggestion is cached on the report and only re-requested if its

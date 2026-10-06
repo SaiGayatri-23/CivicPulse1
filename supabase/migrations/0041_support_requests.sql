@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- In-app "Help & feedback": a citizen opens a request, staff reply from the admin console, and the
 -- thread lives in the app instead of email. All writes go through the functions below, so the
 -- tables themselves grant no direct insert/update to end users.

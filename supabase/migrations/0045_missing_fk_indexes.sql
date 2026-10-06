@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Covering indexes for foreign keys the linter flagged. Harmless now, avoids slow lookups/joins
 -- and locked-table scans on delete as these tables grow.
 create index if not exists child_alerts_created_by_idx on public.child_alerts (created_by);

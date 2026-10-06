@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- The 5-area limit inside the insert policy queried watch_areas itself, which Postgres rejects as
 -- infinite policy recursion. Enforce the limit in a trigger instead.
 drop policy "add own watch area" on public.watch_areas;

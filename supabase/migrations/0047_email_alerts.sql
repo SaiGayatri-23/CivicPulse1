@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Email alerts, using Resend's free tier (3,000 emails/month, no card). Two independent opt-ins:
 --   1. A guest reporter can choose "by email" instead of "on this device" when filing a report —
 --      solves the real problem that a guest session only exists on the one browser that made it.

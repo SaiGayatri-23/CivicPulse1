@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Missing-child (AMBER-style) alerts. Only admins publish, and only with a police FIR/complaint
 -- reference, because a false alert can endanger a child (stalking, custody disputes). Alerts expire
 -- after 72 hours unless renewed; when closed, the photo and description are removed. Sightings are

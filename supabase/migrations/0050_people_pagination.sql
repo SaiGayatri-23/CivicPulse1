@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- The People admin list was hardcoded to the newest 50 matches with no way to page further and no
 -- indication how many people exist in total — fine for a handful of test accounts, not for a real
 -- rollout with lakhs of sign-ups. Add real offset pagination with a total count, and trigram

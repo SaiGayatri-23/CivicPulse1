@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Features from the civic-app research: reference numbers, promised fix dates, "closed without a fix",
 -- reporter accepts or rejects the fix, anonymous and confidential reports, follows, notifications,
 -- extra photos from other citizens, duplicate lookup and a public department scorecard.

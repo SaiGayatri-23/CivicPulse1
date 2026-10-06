@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Data retention promised in the privacy policy, and a small client error log for monitoring.
 
 create extension if not exists pg_cron;

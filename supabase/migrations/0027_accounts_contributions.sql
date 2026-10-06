@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Account types, required sign-up details, masked-Aadhaar verification and the Community contribution feed.
 
 -- ---------------------------------------------------------------------------------------------

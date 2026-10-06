@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Area watches, city alerts, phone push notifications, missions, leaderboard, petitions and admin insights.
 
 -- ---------------------------------------------------------------------------------------------

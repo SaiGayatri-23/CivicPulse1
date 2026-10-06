@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Admin command centre, version 2: filters (area, category, custom dates) and the full metric set.
 drop function if exists public.admin_dashboard(integer);
 

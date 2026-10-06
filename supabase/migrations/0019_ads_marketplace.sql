@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Self-serve ads marketplace (like an Ads Manager, without personal tracking).
 -- Advertisers (NGOs, local businesses) create campaigns; admins review and confirm payment; the feed
 -- serves ads by budget-weighted rotation, optionally matched to the category being viewed (context,

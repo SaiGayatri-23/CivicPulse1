@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Verified business accounts could pass verification (their sign-up hint says "Shops, offices and
 -- companies doing civic work") but could not actually host an event — can_host_events() left
 -- "business" out while every other organisation type was included. Adding it.

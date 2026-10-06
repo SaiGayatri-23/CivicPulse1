@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Home dashboard data: weekly trend, trending reports, recently fixed (before/after) and petitions
 -- close to their goal, plus "near me" ordering. Only public reports (not confidential, not hidden).
 

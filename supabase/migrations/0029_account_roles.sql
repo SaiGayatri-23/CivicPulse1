@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Account types now carry permissions, enforced here rather than in the app:
 --  * Verified community groups, NGOs, schools/colleges and government bodies can publish events.
 --  * Organisations must verify with proof of the organisation; individuals with a personal ID.

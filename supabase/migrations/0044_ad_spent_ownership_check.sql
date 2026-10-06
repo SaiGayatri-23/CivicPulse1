@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- ad_spent_inr had no ownership or admin check: anyone who learned a campaign id (these already
 -- travel to the browser via record_ad_event when a sponsored post is shown) could look up any
 -- advertiser's spend. Nothing in the app calls this function today, but it was still reachable

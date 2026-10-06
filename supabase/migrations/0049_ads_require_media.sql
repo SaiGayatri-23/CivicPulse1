@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Every ad and sponsored post must carry a picture (or GIF/video), same principle as reports.
 -- Campaigns can still be saved as an incomplete draft without media, but cannot be submitted for
 -- review without one. Sponsored posts have no draft step, so it is required at creation.

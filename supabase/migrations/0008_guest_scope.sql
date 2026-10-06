@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Guests (people reporting without an account) may only report and track their own reports.
 -- Backing, commenting, following, adding photos, joining events and saving emergency contacts need
 -- a real account. Restrictive policies are ANDed with the existing ones.

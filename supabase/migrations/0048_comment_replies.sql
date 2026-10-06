@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Nested replies on report comments. Kept to 2 levels (top-level comments + a flat list of
 -- replies under each) rather than arbitrary depth: a reply to a reply is attached to the same
 -- top-level parent, which is what the UI renders and is simpler to reason about than a real tree.

@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Community contributions must include a photo of the work (admins exempt). Existing rows are untouched.
 create or replace function public.contributions_before_insert()
 returns trigger

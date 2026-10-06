@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Everything the admin command centre needs for one period, compared with the period before it.
 create or replace function public.admin_dashboard(p_days integer default 30) returns jsonb
 language plpgsql stable security definer set search_path = '' as $$

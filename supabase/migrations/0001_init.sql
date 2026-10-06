@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- CivicPulse rebuild: core schema, row-level security, server-side rules.
 -- All game rules (points, tiers, comment limits, triage) live here so the
 -- client can never award itself anything.

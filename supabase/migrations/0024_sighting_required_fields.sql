@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Every sighting must include who is reporting, a phone number the police can call back, where,
 -- when and what was seen. (The table was empty when this was applied.)
 alter table public.child_alert_sightings

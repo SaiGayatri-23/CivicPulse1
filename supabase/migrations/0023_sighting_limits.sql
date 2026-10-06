@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Sighting spam protection must not depend on the network address being available.
 -- Limits: 5 per hour per network (when known), and 40 per alert per 10 minutes overall.
 create or replace function public.sightings_before_insert()

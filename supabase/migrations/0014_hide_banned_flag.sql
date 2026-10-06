@@ -1,3 +1,4 @@
+set check_function_bodies = off;
 -- Whether someone is blocked is moderation data, not public profile data. Admins see it through
 -- admin_list_users(); policies use is_banned(), which is security definer and unaffected.
 revoke select on public.profiles from anon, authenticated;
