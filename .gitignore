@@ -6,3 +6,4 @@ dist/
 *.zip
 .DS_Store
 supabase/.temp/
+supabase/.temp-secrets.sql
