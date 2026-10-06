@@ -44,7 +44,7 @@ export function PhotoEditor({ file, open, onClose, onSave }: { file: Blob | null
   return (
     <Modal open={open} title="Hide faces and number plates" onClose={onClose}>
       <div className="space-y-3">
-        <p className="text-xs text-muted">Tap each face or number plate to blur it. The blurring cannot be undone after upload.</p>
+        <p className="text-xs text-muted">Choose a blur size, then tap the photo on each face or number plate. Nothing is blurred until you tap. The blurring cannot be undone after upload.</p>
         <canvas ref={canvas} onPointerDown={tap} className="w-full cursor-crosshair touch-none rounded-lg bg-sand" aria-label="Photo. Tap to blur an area." />
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted">Blur size</span>
@@ -56,7 +56,9 @@ export function PhotoEditor({ file, open, onClose, onSave }: { file: Blob | null
         </div>
         <div className="grid grid-cols-2 gap-2">
           <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-          <button type="button" className="btn btn-primary" onClick={save}>Use this photo</button>
+          <button type="button" className="btn btn-primary" disabled={spots.length === 0} onClick={save} title={spots.length === 0 ? 'Tap the photo first' : undefined}>
+            {spots.length === 0 ? 'Tap the photo to blur' : `Use this photo (${spots.length} blurred)`}
+          </button>
         </div>
       </div>
     </Modal>
@@ -78,5 +80,13 @@ function pixelate(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: numb
   ctx.clip();
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(small, 0, 0, small.width, small.height, x, y, w, h);
+  ctx.restore();
+  // A thin ring so people can see exactly where each tap landed, even on plain backgrounds.
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+  ctx.lineWidth = Math.max(2, Math.round(ctx.canvas.width / 400));
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.stroke();
   ctx.restore();
 }
