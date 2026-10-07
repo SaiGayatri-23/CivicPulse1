@@ -1,11 +1,13 @@
 import { useCallback, useState, type FormEvent } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { Mail, MailCheck } from 'lucide-react';
 import { Captcha, captchaEnabled, getCaptchaToken } from '../components/Captcha';
 import { AddressFields, useAddressFields } from '../components/AddressFields';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { ACCOUNT_TYPES, isOrg, validIndianMobile, type AccountType } from '../lib/accounts';
+
+const VERIFY_NEXT = 'civicpulse:verify-after-signup';
 import { friendlyError } from '../lib/friendlyError';
 
 const GOOGLE_ENABLED = import.meta.env.VITE_AUTH_GOOGLE === 'true';
@@ -17,7 +19,6 @@ export function Auth() {
   // Create account just because they happen to have an anonymous session. Only links that
   // specifically say "Create an account" pass state to open on that tab instead.
   const modeFromState = (location.state as { mode?: 'signin' | 'signup' } | null)?.mode;
-  const navigate = useNavigate();
   const [mode, setMode] = useState<'signin' | 'signup'>(modeFromState ?? 'signin');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -38,7 +39,13 @@ export function Auth() {
   const [captchaOk, setCaptchaOk] = useState(false);
   const onCaptcha = useCallback((t: string | null) => setCaptchaOk(Boolean(t)), []);
 
-  if (userId && !isGuest) return <Navigate to={(location.state as { from?: string } | null)?.from ?? '/'} replace />;
+  if (userId && !isGuest) {
+    // A brand-new citizen account goes to identity verification first; everyone else goes back
+    // to where they came from.
+    let verifyNext = false;
+    try { verifyNext = sessionStorage.getItem(VERIFY_NEXT) === '1'; if (verifyNext) sessionStorage.removeItem(VERIFY_NEXT); } catch { /* private mode */ }
+    return <Navigate to={verifyNext ? '/profile?verify=1' : ((location.state as { from?: string } | null)?.from ?? '/')} replace />;
+  }
 
   if (confirming) {
     return (
@@ -127,16 +134,16 @@ export function Auth() {
       if (error) setError(error.message.toLowerCase().includes('already') ? 'That email already has an account. Use Sign in instead.' : error.message);
       else setConfirming({ email: email.trim(), guestUpgrade: true });
     } else if (mode === 'signup') {
+      // When sign-up signs the person in straight away (no email confirmation step), the redirect
+      // above sends a new citizen to the profile with Aadhaar verification open.
+      if (!isOrg(accountType)) { try { sessionStorage.setItem(VERIFY_NEXT, '1'); } catch { /* private mode */ } }
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: { data: profileData, emailRedirectTo: window.location.origin, captchaToken: getCaptchaToken() ?? undefined },
       });
-      if (error) setError(error.message);
+      if (error) { setError(error.message); try { sessionStorage.removeItem(VERIFY_NEXT); } catch { /* ignore */ } }
       else if (!data.session) setConfirming({ email: email.trim(), guestUpgrade: false });
-      // Signed in straight away (no email confirmation step): go to the profile with the Aadhaar
-      // verification open, so the new account can get the Verified citizen badge right now.
-      else if (!isOrg(accountType)) navigate('/profile?verify=1');
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password, options: { captchaToken: getCaptchaToken() ?? undefined } });
       if (error) setError(error.message.toLowerCase().includes('captcha') ? 'The security check expired. Please try again.' : 'Incorrect email or password.');
