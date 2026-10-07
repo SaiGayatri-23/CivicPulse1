@@ -1,5 +1,5 @@
 import { useCallback, useState, type FormEvent } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Mail, MailCheck } from 'lucide-react';
 import { Captcha, captchaEnabled, getCaptchaToken } from '../components/Captcha';
 import { AddressFields, useAddressFields } from '../components/AddressFields';
@@ -17,6 +17,7 @@ export function Auth() {
   // Create account just because they happen to have an anonymous session. Only links that
   // specifically say "Create an account" pass state to open on that tab instead.
   const modeFromState = (location.state as { mode?: 'signin' | 'signup' } | null)?.mode;
+  const navigate = useNavigate();
   const [mode, setMode] = useState<'signin' | 'signup'>(modeFromState ?? 'signin');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -133,6 +134,9 @@ export function Auth() {
       });
       if (error) setError(error.message);
       else if (!data.session) setConfirming({ email: email.trim(), guestUpgrade: false });
+      // Signed in straight away (no email confirmation step): go to the profile with the Aadhaar
+      // verification open, so the new account can get the Verified citizen badge right now.
+      else if (!isOrg(accountType)) navigate('/profile?verify=1');
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password, options: { captchaToken: getCaptchaToken() ?? undefined } });
       if (error) setError(error.message.toLowerCase().includes('captcha') ? 'The security check expired. Please try again.' : 'Incorrect email or password.');
@@ -211,6 +215,9 @@ export function Auth() {
           {mode === 'signup' && <p className="mt-1 text-[11px] text-muted">At least 10 characters.</p>}
           {mode === 'signin' && <button type="button" onClick={forgot} className="mt-1 inline-flex min-h-10 items-center text-xs font-semibold text-primary underline">Forgot password?</button>}
         </div>
+        )}
+        {mode === 'signup' && !isOrg(accountType) && (
+          <p className="text-xs text-muted">After creating your account you can verify your identity with a <b>masked Aadhaar</b> (only the last 4 digits visible) or another government ID. Verified citizens get a badge and can unlock their profile picture.</p>
         )}
         {mode === 'signup' && (
           <label className="flex items-start gap-2 text-xs text-muted">

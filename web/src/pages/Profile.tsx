@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Award, BadgeCheck, LifeBuoy, Lock, LogOut, Shield, Trash2, TreePine, UserRound } from 'lucide-react';
 import { PasswordCard, SaveGuestAccount } from '../components/AccountCards';
@@ -23,6 +23,13 @@ export function Profile() {
   const qc = useQueryClient();
   const tiers = useTiers();
   const [verifyOpen, setVerifyOpen] = useState(false);
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get('verify') === '1' && profile && !profile.verified && !isGuest) {
+      setVerifyOpen(true);
+      setParams({}, { replace: true });
+    }
+  }, [params, profile, isGuest, setParams]);
   const [form, setForm] = useState({ display_name: '', phone: '', address: '', area: '' });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
