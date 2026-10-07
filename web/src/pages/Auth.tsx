@@ -1,10 +1,10 @@
 import { useCallback, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { Mail, MailCheck } from 'lucide-react';
+import { Mail, MailCheck, Upload } from 'lucide-react';
 import { Captcha, captchaEnabled, getCaptchaToken } from '../components/Captcha';
 import { AddressFields, useAddressFields } from '../components/AddressFields';
 import { useAuth } from '../hooks/useAuth';
-import { supabase } from '../lib/supabase';
+import { supabase, uploadPhoto } from '../lib/supabase';
 import { ACCOUNT_TYPES, isOrg, validIndianMobile, type AccountType } from '../lib/accounts';
 
 const VERIFY_NEXT = 'civicpulse:verify-after-signup';
@@ -22,6 +22,10 @@ export function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup'>(modeFromState ?? 'signin');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  // Aadhaar at sign-up (individuals only): just the last 4 digits plus a photo of the masked card.
+  // The full number is never asked for or stored.
+  const [aadhaarLast4, setAadhaarLast4] = useState('');
+  const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
   const addr = useAddressFields();
   const [accountType, setAccountType] = useState<AccountType>('individual');
   const [orgName, setOrgName] = useState('');
@@ -116,6 +120,10 @@ export function Auth() {
     setNotice(null);
     if (mode === 'signup') {
       if (!validIndianMobile(phone)) { setError('Please enter a valid 10-digit Indian mobile number.'); return; }
+      if (!isOrg(accountType) && (aadhaarLast4 || aadhaarFile)) {
+        if (!/^[0-9]{4}$/.test(aadhaarLast4)) { setError('Enter only the last 4 digits of your Aadhaar.'); return; }
+        if (!aadhaarFile) { setError('Please upload a photo of your masked Aadhaar, or clear the Aadhaar digits.'); return; }
+      }
       if (!addr.valid()) { setError('Please fill in at least the street, area and city, and a 6-digit PIN code if given.'); return; }
       if (isOrg(accountType) && orgName.trim().length < 2) { setError(`Please enter the ${ACCOUNT_TYPES[accountType].orgLabel?.toLowerCase()}.`); return; }
     }
@@ -144,6 +152,15 @@ export function Auth() {
       });
       if (error) { setError(error.message); try { sessionStorage.removeItem(VERIFY_NEXT); } catch { /* ignore */ } }
       else if (!data.session) setConfirming({ email: email.trim(), guestUpgrade: false });
+      else if (!isOrg(accountType) && aadhaarFile && data.user) {
+        // Aadhaar given on the form: file the verification request now so the admin sees it at once.
+        try {
+          const path = await uploadPhoto(data.user.id, aadhaarFile, 'id-docs');
+          const { error: vErr } = await supabase.from('verification_requests').insert({ user_id: data.user.id, doc_type: 'masked_aadhaar', doc_path: path, aadhaar_last4: aadhaarLast4 });
+          if (vErr) await supabase.storage.from('id-docs').remove([path]);
+          else { try { sessionStorage.removeItem(VERIFY_NEXT); } catch { /* ignore */ } }
+        } catch { /* the profile page still offers verification if this upload failed */ }
+      }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password, options: { captchaToken: getCaptchaToken() ?? undefined } });
       if (error) setError(error.message.toLowerCase().includes('captcha') ? 'The security check expired. Please try again.' : 'Incorrect email or password.');
@@ -209,6 +226,17 @@ export function Auth() {
             )}
             <div><label className="label" htmlFor="name">{isOrg(accountType) ? 'Contact person name' : 'Your name'}</label><input id="name" className="input" required minLength={2} maxLength={60} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} /></div>
             <div><label className="label" htmlFor="phone">Mobile number</label><input id="phone" className="input" type="tel" inputMode="tel" required autoComplete="tel" placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+            {!isOrg(accountType) && (
+              <div className="space-y-2 rounded-xl border border-line p-3">
+                <p className="text-sm font-semibold">Aadhaar <span className="font-normal text-muted">(optional, for the Verified citizen badge)</span></p>
+                <div><label className="label" htmlFor="aadhaar4">Last 4 digits of your Aadhaar</label><input id="aadhaar4" className="input" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} placeholder="1234" value={aadhaarLast4} onChange={(e) => setAadhaarLast4(e.target.value.replace(/[^0-9]/g, ''))} /></div>
+                <label className="btn btn-ghost w-full cursor-pointer justify-center gap-2">
+                  <Upload size={16} /> {aadhaarFile ? aadhaarFile.name.slice(0, 28) : 'Upload a photo of your masked Aadhaar'}
+                  <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => setAadhaarFile(e.target.files?.[0] ?? null)} />
+                </label>
+                <p className="text-[11px] text-muted">Use the <b>masked Aadhaar</b> (first 8 digits hidden), downloadable free from <a href="https://myaadhaar.uidai.gov.in/" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline">myaadhaar.uidai.gov.in</a>. We never ask for or store the full number. An admin reviews it and marks you Verified.</p>
+              </div>
+            )}
             <AddressFields idPrefix="su" label={isOrg(accountType) ? 'Office address' : 'Address'} state={addr} />
           </>
         )}
@@ -223,8 +251,8 @@ export function Auth() {
           {mode === 'signin' && <button type="button" onClick={forgot} className="mt-1 inline-flex min-h-10 items-center text-xs font-semibold text-primary underline">Forgot password?</button>}
         </div>
         )}
-        {mode === 'signup' && !isOrg(accountType) && (
-          <p className="text-xs text-muted">After creating your account you can verify your identity with a <b>masked Aadhaar</b> (only the last 4 digits visible) or another government ID. Verified citizens get a badge and can unlock their profile picture.</p>
+        {mode === 'signup' && !isOrg(accountType) && !aadhaarFile && (
+          <p className="text-xs text-muted">No Aadhaar handy? You can verify later from your profile with a masked Aadhaar or another government ID.</p>
         )}
         {mode === 'signup' && (
           <label className="flex items-start gap-2 text-xs text-muted">
