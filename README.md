@@ -37,7 +37,6 @@ shared with anyone you don't trust with admin access.
 | `ngo@civicpulse.test` | `Test@12345` | Verified NGO — org badge, hosting events, Community Contributions |
 | `gov@civicpulse.test` | `Test@12345` | Verified government body — same as NGO, plus the "Official" label on comments |
 | `citizen@civicpulse.test` | `Test@12345` | Unverified individual, for comparison against the verified accounts above |
-`cd "C:\Users\chelu\OneDrive\Desktop\CivicPulse"`
 Not yet covered: verified `community`, `business` and `education` accounts. Ask for the same kind
 of setup script to add them if you need to test those specifically.
 
