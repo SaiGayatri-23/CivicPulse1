@@ -9,7 +9,7 @@ import { DOC_TYPES } from '../components/VerifyFlow';
 import { useAuth } from '../hooks/useAuth';
 import { ActivityAdmin, AdsAdmin, AlertsAdmin, BusRoutesAdmin, ChildAlertsAdmin, ErrorsAdmin, InsightsAdmin, MissionsAdmin, ModerationAdmin, PeopleAdmin, PetitionsAdmin, RepliesAdmin, SupportAdmin } from './AdminMore';
 import { CLOSED_REASONS, EVENT_CATEGORIES, ISSUE_CATEGORIES, ISSUE_COLS, STATUS_CLASS, STATUS_LABEL, formatDate, formatEventTime, isOverdue, timeAgo } from '../lib/constants';
-import { signedDocUrl, supabase, uploadAdMedia, uploadPhoto } from '../lib/supabase';
+import { photoUrl, signedDocUrl, supabase, uploadAdMedia, uploadPhoto } from '../lib/supabase';
 import type { CityEvent, ClosedReason, EventCategory, Helpline, Issue, IssueStatus, UtilityLink } from '../lib/types';
 import { friendlyError } from '../lib/friendlyError';
 
@@ -257,6 +257,17 @@ function QueueCard({ it, me, claim, busy, onUpdate, onClaim, onMerge }: {
       </div>
       <Link to={`/issues/${it.id}`} className="block text-lg leading-tight font-semibold hover:text-primary">{it.title}</Link>
       <p className="text-xs text-muted">{it.location_text} · {timeAgo(it.created_at)} · {it.upvote_count} backing</p>
+      {/* The reporter's photo and details, so staff can judge the problem without opening the report. */}
+      {(it.photo_path || it.description) && (
+        <div className="flex gap-3">
+          {it.photo_path && (
+            <Link to={`/issues/${it.id}`} className="shrink-0" title="Open the full report">
+              <img src={photoUrl(it.photo_path) ?? undefined} alt="" loading="lazy" className="h-24 w-32 rounded-lg object-cover" />
+            </Link>
+          )}
+          {it.description && <p className="line-clamp-4 text-sm text-muted">{it.description}</p>}
+        </div>
+      )}
 
       {/* One admin works a ticket at a time; the database enforces this too. */}
       <div className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs ${lockedBy ? 'bg-blush text-brick' : mine ? 'bg-primary-soft text-primary' : 'bg-sand/70 text-muted'}`}>
