@@ -111,7 +111,8 @@ export function ReportIssue() {
   // Only asked of people without an account. "Device" keeps a guest session here so the app can
   // show updates and let them confirm the fix, but only on this browser. "Email" works anywhere,
   // any device, any time, at the cost of no in-app confirm-the-fix flow. "None": filed and forgotten.
-  const [followUp, setFollowUp] = useState<'none' | 'device' | 'email'>('none');
+  // Default to email so a guest gets status updates without having to opt in; they can still switch.
+  const [followUp, setFollowUp] = useState<'none' | 'device' | 'email'>('email');
   const [guest, setGuest] = useState<GuestDetails>(loadDetails);
   const signedOut = !userId;
   const [captchaOk, setCaptchaOk] = useState(false);
@@ -472,7 +473,7 @@ export function ReportIssue() {
             <input className="input" type="tel" inputMode="numeric" required maxLength={16} autoComplete="tel-national" aria-label="Mobile number" placeholder="10-digit mobile"
               value={guest.phone} onChange={(e) => setGuest({ ...guest, phone: e.target.value })} />
           </div>
-          <p className="text-xs text-muted">Private: only CivicPulse admins see these. Without an account you can file 3 reports every 30 days.</p>
+          <p className="text-xs text-muted">Private: only CivicPulse admins see these. Without an account you can file up to 10 reports a day.</p>
         </fieldset>
       )}
 
@@ -523,9 +524,14 @@ export function ReportIssue() {
         <section role="alert" className="space-y-3 rounded-xl border border-gold-line bg-gold-soft p-4">
           {dupe.own ? (
             <>
-              <h2 className="text-sm font-bold">You have already reported this</h2>
-              <p className="text-sm">Your report <b>{dupe.ref}</b> for this spot is still open and being tracked. Reporting it again will not speed it up.</p>
-              <Link to={`/issues/${dupe.issueId}`} className="btn btn-primary w-full">Open my report {dupe.ref}</Link>
+              <h2 className="text-sm font-bold">You already have an open report of this kind here</h2>
+              <p className="text-sm">
+                Your report <b>{dupe.ref}</b> is nearby and still being tracked. If this is the same problem, reporting it again will not speed it up. If it is a different problem, send it anyway.
+              </p>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Link to={`/issues/${dupe.issueId}`} className="btn btn-primary flex-1">Open my report {dupe.ref}</Link>
+                <button type="button" className="btn btn-ghost flex-1" disabled={busy} onClick={() => void send(true)}>It is a different problem, send mine</button>
+              </div>
             </>
           ) : (
             <>

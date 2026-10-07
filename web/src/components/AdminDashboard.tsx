@@ -667,7 +667,7 @@ export function AdminDashboard({ onOpen, snapshot }: { onOpen: (tab: string) => 
             </Card>
             <Card title="Guest reporting" icon={UserX}>
               <p className="text-4xl font-bold tabular-nums">{d.people.guest_report_pct == null ? '–' : `${d.people.guest_report_pct}%`}</p>
-              <p className="mt-1 text-sm text-muted">of reports in this period came from people without an account. Guests are limited to 3 reports per 30 days per email, phone and device.</p>
+              <p className="mt-1 text-sm text-muted">of reports in this period came from people without an account. Guests are limited to 10 reports a day per email, phone and device.</p>
             </Card>
           </div>
 
