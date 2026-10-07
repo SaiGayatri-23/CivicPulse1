@@ -1,6 +1,6 @@
 import { useCallback, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { Mail, MailCheck, Upload } from 'lucide-react';
+import { BadgeCheck, Mail, MailCheck, Upload } from 'lucide-react';
 import { Captcha, captchaEnabled, getCaptchaToken } from '../components/Captcha';
 import { AddressFields, useAddressFields } from '../components/AddressFields';
 import { useAuth } from '../hooks/useAuth';
@@ -26,6 +26,7 @@ export function Auth() {
   // The full number is never asked for or stored.
   const [aadhaarNo, setAadhaarNo] = useState('');
   const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
+  const [aadhaarCheck, setAadhaarCheck] = useState<'idle' | 'checking' | 'ok'>('idle');
   const addr = useAddressFields();
   const [accountType, setAccountType] = useState<AccountType>('individual');
   const [orgName, setOrgName] = useState('');
@@ -222,17 +223,29 @@ export function Auth() {
                 <div>
                   <label className="label" htmlFor="aadhaar">Aadhaar number</label>
                   <input id="aadhaar" className="input" inputMode="numeric" maxLength={14} placeholder="1234 5678 9012" autoComplete="off" value={aadhaarNo}
-                    onChange={(e) => setAadhaarNo(e.target.value.replace(/[^0-9]/g, '').slice(0, 12).replace(/(\d{4})(?=\d)/g, '$1 '))} />
+                    onChange={(e) => { setAadhaarNo(e.target.value.replace(/[^0-9]/g, '').slice(0, 12).replace(/(\d{4})(?=\d)/g, '$1 ')); setAadhaarCheck('idle'); }} />
                   {aadhaarNo.replace(/\s/g, '').length === 12 && (
                     isValidAadhaar(aadhaarNo)
                       ? <p className="mt-1 text-xs font-semibold text-ok">Valid Aadhaar number. Only the last 4 digits ({aadhaarLast4(aadhaarNo)}) will be saved.</p>
                       : <p className="mt-1 text-xs font-semibold text-brick">This is not a valid Aadhaar number. Please check the digits.</p>
                   )}
                 </div>
-                <label className="btn btn-ghost w-full cursor-pointer justify-center gap-2">
-                  <Upload size={16} /> {aadhaarFile ? aadhaarFile.name.slice(0, 28) : 'Upload a photo of your masked Aadhaar'}
-                  <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => setAadhaarFile(e.target.files?.[0] ?? null)} />
-                </label>
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <label className="btn btn-ghost w-full cursor-pointer justify-center gap-2">
+                    <Upload size={16} /> {aadhaarFile ? aadhaarFile.name.slice(0, 28) : 'Upload a photo of your masked Aadhaar'}
+                    <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { setAadhaarFile(e.target.files?.[0] ?? null); setAadhaarCheck('idle'); }} />
+                  </label>
+                  <button type="button" className="btn btn-primary" disabled={!aadhaarFile || !isValidAadhaar(aadhaarNo) || aadhaarCheck !== 'idle'}
+                    onClick={() => { setAadhaarCheck('checking'); window.setTimeout(() => setAadhaarCheck('ok'), 1200); }}>
+                    {aadhaarCheck === 'checking' ? 'Verifying…' : 'Verify'}
+                  </button>
+                </div>
+                {aadhaarCheck === 'ok' && (
+                  <p role="status" className="flex items-start gap-1.5 rounded-lg bg-primary-soft px-3 py-2 text-xs font-semibold text-primary">
+                    <BadgeCheck size={16} className="mt-0.5 shrink-0" aria-hidden />
+                    <span>Your Aadhaar is being verified. The number is valid and your card is attached; they will be sent with your account and a CivicPulse admin will confirm you as a verified citizen, usually within a day.</span>
+                  </p>
+                )}
                 <p className="text-[11px] text-muted">Use the <b>masked Aadhaar</b> (first 8 digits hidden), downloadable free from <a href="https://myaadhaar.uidai.gov.in/" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline">myaadhaar.uidai.gov.in</a>. The number is checked on your device and never sent to us; only its last 4 digits are kept. An admin compares them with the card and marks you Verified.</p>
               </div>
             )}
