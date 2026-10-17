@@ -6,6 +6,7 @@ import { AddressFields, useAddressFields } from '../components/AddressFields';
 import { useAuth } from '../hooks/useAuth';
 import { supabase, uploadPhoto } from '../lib/supabase';
 import { aadhaarLast4, isValidAadhaar } from '../lib/aadhaar';
+import { downscaleForAI } from '../lib/blur';
 import { ACCOUNT_TYPES, isOrg, validIndianMobile, type AccountType } from '../lib/accounts';
 
 import { friendlyError } from '../lib/friendlyError';
@@ -13,7 +14,7 @@ import { friendlyError } from '../lib/friendlyError';
 const GOOGLE_ENABLED = import.meta.env.VITE_AUTH_GOOGLE === 'true';
 
 export function Auth() {
-  const { userId, isGuest } = useAuth();
+  const { userId, isGuest, refreshProfile } = useAuth();
   const location = useLocation();
   // Default to Sign in, whatever the visitor's guest status — a "Sign in" link should not land on
   // Create account just because they happen to have an anonymous session. Only links that
@@ -148,8 +149,11 @@ export function Auth() {
         // Aadhaar given on the form: file the verification request now so the admin sees it at once.
         try {
           const path = await uploadPhoto(data.user.id, aadhaarFile, 'id-docs');
-          const { error: vErr } = await supabase.from('verification_requests').insert({ user_id: data.user.id, doc_type: 'masked_aadhaar', doc_path: path, aadhaar_last4: aadhaarLast4(aadhaarNo) });
+          const { base64, mime } = await downscaleForAI(aadhaarFile);
+          // The AI reads the card; if name and last 4 digits match, the account is Verified at once.
+          const { error: vErr } = await supabase.rpc('citizen_auto_verify', { p_image_base64: base64, p_mime: mime, p_last4: aadhaarLast4(aadhaarNo), p_doc_path: path });
           if (vErr) await supabase.storage.from('id-docs').remove([path]);
+          refreshProfile();
         } catch { /* the profile page still offers verification if this upload failed */ }
       }
     } else {
@@ -243,7 +247,7 @@ export function Auth() {
                 {aadhaarCheck === 'ok' && (
                   <p role="status" className="flex items-start gap-1.5 rounded-lg bg-primary-soft px-3 py-2 text-xs font-semibold text-primary">
                     <BadgeCheck size={16} className="mt-0.5 shrink-0" aria-hidden />
-                    <span>Your Aadhaar is being verified. The number is valid and your card is attached; they will be sent with your account and a CivicPulse admin will confirm you as a verified citizen, usually within a day.</span>
+                    <span>Your Aadhaar is ready to be verified. When you create the account, the card is read automatically; if the name and last 4 digits match, you are marked a Verified citizen immediately. If it cannot be read, a CivicPulse admin checks it within a day.</span>
                   </p>
                 )}
                 <p className="text-[11px] text-muted">Use the <b>masked Aadhaar</b> (first 8 digits hidden), downloadable free from <a href="https://myaadhaar.uidai.gov.in/" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline">myaadhaar.uidai.gov.in</a>. The number is checked on your device and never sent to us; only its last 4 digits are kept. An admin compares them with the card and marks you Verified.</p>

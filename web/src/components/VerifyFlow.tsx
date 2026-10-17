@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileCheck2, Upload } from 'lucide-react';
 import { Modal } from './Modal';
+import { downscaleForAI } from '../lib/blur';
 import { timeAgo } from '../lib/constants';
 import { supabase, uploadPhoto } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
@@ -57,20 +58,35 @@ export function VerifyFlow({ userId, open, onClose }: { userId: string; open: bo
   const [file, setFile] = useState<File | null>(null);
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [outcome, setOutcome] = useState<string | null>(null);
 
   const submit = useMutation({
     mutationFn: async () => {
       if (docType === 'masked_aadhaar' && !/^[0-9]{4}$/.test(last4)) throw new Error('Enter only the last 4 digits of your Aadhaar.');
       const path = await uploadPhoto(userId, file!, 'id-docs');
+      if (docType === 'masked_aadhaar') {
+        // The AI reads the masked card; a match verifies the account at once, otherwise it queues for review.
+        const { base64, mime } = await downscaleForAI(file!);
+        const { data, error } = await supabase.rpc('citizen_auto_verify', { p_image_base64: base64, p_mime: mime, p_last4: last4, p_doc_path: path });
+        if (error) { await supabase.storage.from('id-docs').remove([path]); throw new Error(error.message); }
+        const r = data as { ok: boolean; verified?: boolean; reason?: string; error?: string };
+        if (!r.ok) throw new Error(r.error ?? 'Could not verify.');
+        return r;
+      }
       const { error } = await supabase.from('verification_requests').insert({
-        user_id: userId, doc_type: docType, doc_path: path, aadhaar_last4: docType === 'masked_aadhaar' ? last4 : null,
+        user_id: userId, doc_type: docType, doc_path: path, aadhaar_last4: null,
       });
       if (error) {
         await supabase.storage.from('id-docs').remove([path]);
         throw new Error(error.message.includes('one_pending') ? 'You already have a request waiting for review.' : error.message);
       }
+      return { ok: true, verified: false } as { ok: boolean; verified?: boolean; reason?: string };
     },
-    onSuccess: () => { setFile(null); setAgree(false); setLast4(''); setError(null); qc.invalidateQueries({ queryKey: ['my-verification'] }); },
+    onSuccess: (r) => {
+      setFile(null); setAgree(false); setLast4(''); setError(null);
+      setOutcome(r?.verified ? 'verified' : (r?.reason ?? 'Sent for review.'));
+      qc.invalidateQueries({ queryKey: ['my-verification'] }); qc.invalidateQueries({ queryKey: ['profile'] });
+    },
     onError: (e: Error) => setError(e.message),
   });
 
@@ -80,6 +96,14 @@ export function VerifyFlow({ userId, open, onClose }: { userId: string; open: bo
 
   return (
     <Modal open={open} title="Get verified" onClose={onClose}>
+      {outcome === 'verified' && (
+        <p role="status" className="flex items-start gap-2 rounded-xl bg-primary-soft p-3 text-sm font-semibold text-primary">
+          <FileCheck2 size={18} className="mt-0.5 shrink-0" aria-hidden /> Your masked Aadhaar was read and matched your name and last 4 digits. You are now a Verified citizen.
+        </p>
+      )}
+      {outcome && outcome !== 'verified' && (
+        <p role="status" className="rounded-xl bg-sand p-3 text-sm">{outcome}</p>
+      )}
       {pending ? (
         <div className="space-y-3 text-sm">
           <p className="flex items-center gap-2 font-display text-lg font-semibold"><FileCheck2 size={20} className="text-primary" /> Request received</p>
