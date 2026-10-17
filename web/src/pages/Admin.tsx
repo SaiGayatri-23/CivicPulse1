@@ -215,7 +215,7 @@ function IssueQueue({ userId }: { userId: string }) {
   );
 }
 
-type ReporterContact = { issue_id: string; name: string; email: string; phone: string };
+type ReporterContact = { issue_id: string; name: string; email: string | null; phone: string | null; guest: boolean };
 type Claim = { issue_id: string; admin_id: string; claimed_at: string; admin: { display_name: string } | null };
 const CLAIM_HOURS = 4;
 
@@ -322,9 +322,10 @@ function QueueCard({ it, me, claim, busy, onUpdate, onClaim, onMerge }: {
         <p className="text-xs text-muted">Reported with an account. Reply with a comment on the report.</p>
       ) : (
         <p className="rounded-lg bg-sand/70 px-3 py-2 text-xs">
-          <span className="font-semibold">Reported without an account:</span> {contact.name} ·{' '}
-          <a href={`tel:${contact.phone}`} className="text-primary underline">{contact.phone}</a> ·{' '}
-          <a href={`mailto:${contact.email}`} className="text-primary underline">{contact.email}</a>
+          <span className="font-semibold">{contact.guest ? 'Reported without an account:' : 'Reported with an account:'}</span> {contact.name}
+          {contact.phone && <> · <a href={`tel:${contact.phone}`} className="text-primary underline">{contact.phone}</a></>}
+          {contact.email && <> · <a href={`mailto:${contact.email}`} className="text-primary underline">{contact.email}</a></>}
+          {!contact.phone && !contact.email && <span className="text-muted"> (no phone or email on the profile)</span>}
           {it.anonymous && <span className="text-muted"> (hidden from the public)</span>}
         </p>
       )}
