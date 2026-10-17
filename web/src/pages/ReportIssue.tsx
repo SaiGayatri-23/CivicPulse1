@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowBigUp, BellRing, Camera, EyeOff, Globe, Lock, MapPinned, ScanFace, Sparkles, Trash2, UserRound, Video, WifiOff } from 'lucide-react';
 import { LocationPicker } from '../components/IssueMap';
 import { PhotoEditor } from '../components/PhotoEditor';
+import { downscaleForAI, pixelateRegions, type PrivacyRegion } from '../lib/blur';
 import { useAuth } from '../hooks/useAuth';
 import { useLocation2 } from '../hooks/useLocation';
 import { useT } from '../lib/i18n';
@@ -20,7 +21,18 @@ import { validIndianMobile } from '../lib/accounts';
 type LatLng = { lat: number; lng: number };
 type GuestDetails = { name: string; email: string; phone: string };
 type Visibility = 'public' | 'anonymous' | 'confidential';
-type Photo = { id: string; blob: Blob; url: string; edited: boolean };
+type Photo = { id: string; blob: Blob; url: string; edited: boolean; auto?: 'checking' | 'done' | 'failed'; hidden?: { faces: number; plates: number } };
+function autoBlurStatus(p: Photo): string {
+  if (p.auto === 'checking') return 'Checking for faces and plates…';
+  if (p.auto === 'failed') return 'Auto-blur unavailable, tap Blur to hide manually';
+  const faces = p.hidden?.faces ?? 0, plates = p.hidden?.plates ?? 0;
+  if (faces + plates === 0) return p.auto === 'done' ? 'No faces or plates found' : '';
+  const parts: string[] = [];
+  if (plates) parts.push(plates + (plates > 1 ? ' number plates' : ' number plate'));
+  if (faces) parts.push(faces + (faces > 1 ? ' faces' : ' face'));
+  return 'Hidden automatically: ' + parts.join(', ');
+}
+
 
 const MAX_PHOTOS = 3;
 const DETAILS_KEY = 'civicpulse:guest-details';
@@ -49,17 +61,6 @@ function loadDetails(): GuestDetails {
 
 // A small, low-quality copy of a photo, just for the AI suggestion request — keeps the upload
 // fast and the request well under the size the server accepts.
-async function downscaleForAI(file: Blob): Promise<{ base64: string; mime: string }> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 768 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-  return { base64: dataUrl.slice(dataUrl.indexOf(',') + 1), mime: 'image/jpeg' };
-}
 
 // Reads the GPS position stored in a photo, if any, before the upload strips it.
 async function photoLocation(file: Blob): Promise<LatLng | null> {
@@ -187,12 +188,34 @@ export function ReportIssue() {
     },
   });
 
+  async function autoBlur(ph: Photo) {
+    try {
+      await ensureSignedIn();
+      const { base64, mime } = await downscaleForAI(ph.blob);
+      const { data, error } = await supabase.rpc('detect_privacy_regions', { p_image_base64: base64, p_mime: mime });
+      if (error) throw new Error(error.message);
+      const r = data as { ok: boolean; regions?: PrivacyRegion[]; error?: string };
+      if (!r.ok) throw new Error(r.error ?? 'check failed');
+      const regions = r.regions ?? [];
+      const hidden = { faces: regions.filter((x) => x.label === 'face').length, plates: regions.filter((x) => x.label === 'number_plate').length };
+      if (regions.length === 0) { setPhotos((cur) => cur.map((q) => (q.id === ph.id ? { ...q, auto: 'done', hidden } : q))); return; }
+      const blurred = await pixelateRegions(ph.blob, regions);
+      setPhotos((cur) => cur.map((q) => (q.id === ph.id ? { ...q, blob: blurred, url: URL.createObjectURL(blurred), edited: true, auto: 'done', hidden } : q)));
+    } catch {
+      setPhotos((cur) => cur.map((q) => (q.id === ph.id ? { ...q, auto: 'failed' } : q)));
+    }
+  }
+
   async function addPhotos(files: FileList | null) {
     if (!files) return;
     const room = MAX_PHOTOS - photos.length;
     const picked = [...files].filter((f) => f.type.startsWith('image/')).slice(0, room);
     if (picked.length === 0) return;
-    setPhotos((cur) => [...cur, ...picked.map((f) => ({ id: crypto.randomUUID(), blob: f as Blob, url: URL.createObjectURL(f), edited: false }))]);
+    const added: Photo[] = picked.map((f) => ({ id: crypto.randomUUID(), blob: f as Blob, url: URL.createObjectURL(f), edited: false, auto: 'checking' }));
+    setPhotos((cur) => [...cur, ...added]);
+    // Privacy first: find faces and number plates and pixelate them automatically, on the device,
+    // before anything is uploaded. The reporter can still adjust with the Blur button.
+    for (const ph of added) void autoBlur(ph);
     if (!coords) {
       const loc = await photoLocation(picked[0]);
       if (loc) { setCoords(loc); setFromPhoto(true); }
@@ -346,9 +369,10 @@ export function ReportIssue() {
             {photos.map((p) => (
               <li key={p.id} className="overflow-hidden rounded-xl border border-line bg-card">
                 <img src={p.url} alt="Selected" className="aspect-square w-full object-cover" />
+                <p className="px-1 pt-1 text-center text-[10px] leading-tight text-muted">{autoBlurStatus(p)}</p>
                 <div className="flex">
                   <button type="button" onClick={() => setEditing(p)} className="flex min-h-9 flex-1 items-center justify-center gap-1 text-[11px] font-semibold text-primary hover:bg-sand">
-                    <ScanFace size={13} /> {p.edited ? 'Blurred' : 'Blur'}
+                    <ScanFace size={13} /> {p.edited ? 'Adjust blur' : 'Blur'}
                   </button>
                   <button type="button" onClick={() => removePhoto(p.id)} aria-label="Remove photo" className="flex min-h-9 w-9 items-center justify-center text-muted hover:bg-blush hover:text-brick"><Trash2 size={14} /></button>
                 </div>
@@ -363,7 +387,7 @@ export function ReportIssue() {
               onChange={(e) => { addPhotos(e.target.files); e.target.value = ''; }} />
           </label>
         )}
-        <p className="mt-1 text-[11px] text-muted">Use "Blur" to hide faces and number plates. Hidden location data in photos is removed before upload.</p>
+        <p className="mt-1 text-[11px] text-muted">Faces and vehicle number plates are blurred automatically before upload; use "Blur" to adjust. Hidden location data in photos is removed before upload.</p>
         {photos.length === 0 && <p className="mt-1 text-[11px] font-semibold text-brick">Add at least one photo so staff can see the problem.</p>}
 
         {photos.length > 0 && !aiSuggest.data && (

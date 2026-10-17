@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Undo2 } from 'lucide-react';
 import { Modal } from './Modal';
+import { pixelate } from '../lib/blur';
 
 type Spot = { x: number; y: number; r: number }; // fractions of the image width/height
 
@@ -63,30 +64,4 @@ export function PhotoEditor({ file, open, onClose, onSave }: { file: Blob | null
       </div>
     </Modal>
   );
-}
-
-function pixelate(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
-  const x = Math.max(0, Math.round(cx - r)), y = Math.max(0, Math.round(cy - r));
-  const w = Math.min(ctx.canvas.width - x, Math.round(r * 2)), h = Math.min(ctx.canvas.height - y, Math.round(r * 2));
-  if (w <= 0 || h <= 0) return;
-  const block = Math.max(6, Math.round(r / 5));
-  const small = document.createElement('canvas');
-  small.width = Math.max(1, Math.round(w / block));
-  small.height = Math.max(1, Math.round(h / block));
-  small.getContext('2d')!.drawImage(ctx.canvas, x, y, w, h, 0, 0, small.width, small.height);
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
-  ctx.clip();
-  ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(small, 0, 0, small.width, small.height, x, y, w, h);
-  ctx.restore();
-  // A thin ring so people can see exactly where each tap landed, even on plain backgrounds.
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
-  ctx.lineWidth = Math.max(2, Math.round(ctx.canvas.width / 400));
-  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-  ctx.stroke();
-  ctx.restore();
 }

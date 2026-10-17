@@ -4,8 +4,9 @@ import { BADGE, useAdminOverview } from '../components/AdminOverview';
 import { AdminDashboard } from '../components/AdminDashboard';
 import { StaffReports } from '../components/StaffReports';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Eye, Lock, Pencil, Sparkles, Trash2 } from 'lucide-react';
+import { Eye, Lock, Pencil, ScanFace, Sparkles, Trash2 } from 'lucide-react';
 import { DOC_TYPES } from '../components/VerifyFlow';
+import { PhotoEditor } from '../components/PhotoEditor';
 import { useAuth } from '../hooks/useAuth';
 import { ActivityAdmin, AdsAdmin, AlertsAdmin, BusRoutesAdmin, ChildAlertsAdmin, ErrorsAdmin, InsightsAdmin, MissionsAdmin, ModerationAdmin, PeopleAdmin, PetitionsAdmin, RepliesAdmin, SupportAdmin } from './AdminMore';
 import { CLOSED_REASONS, EVENT_CATEGORIES, ISSUE_CATEGORIES, ISSUE_COLS, STATUS_CLASS, STATUS_LABEL, formatDate, formatEventTime, isOverdue, timeAgo } from '../lib/constants';
@@ -240,6 +241,27 @@ function QueueCard({ it, me, claim, busy, onUpdate, onClaim, onMerge }: {
     setContact(((data as ReporterContact[] | null) ?? [])[0] ?? null);
   }
   const [closing, setClosing] = useState(false);
+  // Staff blur: fetch the public photo, open the same editor the reporter has, upload the blurred
+  // copy and swap it in through an audited function.
+  const qcBlur = useQueryClient();
+  const [blurFile, setBlurFile] = useState<Blob | null>(null);
+  const [blurBusy, setBlurBusy] = useState(false);
+  async function openBlur() {
+    const url = photoUrl(it.photo_path);
+    if (!url) return;
+    setBlurBusy(true);
+    try { setBlurFile(await (await fetch(url)).blob()); } finally { setBlurBusy(false); }
+  }
+  async function saveBlur(b: Blob) {
+    setBlurBusy(true);
+    try {
+      const path = await uploadPhoto(me, b);
+      const { error } = await supabase.rpc('admin_replace_issue_photo', { p_issue: it.id, p_new_path: path });
+      if (error) throw new Error(error.message);
+      setBlurFile(null);
+      qcBlur.invalidateQueries({ queryKey: ['admin-issues'] });
+    } finally { setBlurBusy(false); }
+  }
   const [reason, setReason] = useState<ClosedReason>('other_agency');
   const [note, setNote] = useState('');
   const overdue = isOverdue(it);
@@ -261,9 +283,15 @@ function QueueCard({ it, me, claim, busy, onUpdate, onClaim, onMerge }: {
       {(it.photo_path || it.description) && (
         <div className="flex gap-3">
           {it.photo_path && (
-            <Link to={`/issues/${it.id}`} className="shrink-0" title="Open the full report">
-              <img src={photoUrl(it.photo_path) ?? undefined} alt="" loading="lazy" className="h-24 w-32 rounded-lg object-cover" />
-            </Link>
+            <div className="shrink-0">
+              <Link to={`/issues/${it.id}`} title="Open the full report">
+                <img src={photoUrl(it.photo_path) ?? undefined} alt="" loading="lazy" className="h-24 w-32 rounded-lg object-cover" />
+              </Link>
+              <button type="button" className="mt-1 inline-flex min-h-7 w-32 items-center justify-center gap-1 text-[11px] font-semibold text-primary underline" disabled={blurBusy} onClick={() => void openBlur()}>
+                <ScanFace size={12} /> {blurBusy ? 'Working…' : 'Blur faces / plates'}
+              </button>
+              <PhotoEditor file={blurFile} open={Boolean(blurFile)} onClose={() => setBlurFile(null)} onSave={(b) => void saveBlur(b)} />
+            </div>
           )}
           {it.description && <p className="line-clamp-4 text-sm text-muted">{it.description}</p>}
         </div>
