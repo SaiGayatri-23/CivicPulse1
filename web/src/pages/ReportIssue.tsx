@@ -21,10 +21,10 @@ import { validIndianMobile } from '../lib/accounts';
 type LatLng = { lat: number; lng: number };
 type GuestDetails = { name: string; email: string; phone: string };
 type Visibility = 'public' | 'anonymous' | 'confidential';
-type Photo = { id: string; blob: Blob; url: string; edited: boolean; auto?: 'checking' | 'done' | 'failed'; hidden?: { faces: number; plates: number } };
+type Photo = { id: string; blob: Blob; url: string; edited: boolean; auto?: 'checking' | 'done' | 'failed'; autoError?: string; hidden?: { faces: number; plates: number } };
 function autoBlurStatus(p: Photo): string {
   if (p.auto === 'checking') return 'Checking for faces and plates…';
-  if (p.auto === 'failed') return 'Auto-blur unavailable, tap Blur to hide manually';
+  if (p.auto === 'failed') return `Auto-blur unavailable${p.autoError ? ` (${p.autoError})` : ''}, tap Blur to hide manually`;
   const faces = p.hidden?.faces ?? 0, plates = p.hidden?.plates ?? 0;
   if (faces + plates === 0) return p.auto === 'done' ? 'No faces or plates found' : '';
   const parts: string[] = [];
@@ -201,8 +201,9 @@ export function ReportIssue() {
       if (regions.length === 0) { setPhotos((cur) => cur.map((q) => (q.id === ph.id ? { ...q, auto: 'done', hidden } : q))); return; }
       const blurred = await pixelateRegions(ph.blob, regions);
       setPhotos((cur) => cur.map((q) => (q.id === ph.id ? { ...q, blob: blurred, url: URL.createObjectURL(blurred), edited: true, auto: 'done', hidden } : q)));
-    } catch {
-      setPhotos((cur) => cur.map((q) => (q.id === ph.id ? { ...q, auto: 'failed' } : q)));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message.slice(0, 80) : 'error';
+      setPhotos((cur) => cur.map((q) => (q.id === ph.id ? { ...q, auto: 'failed', autoError: msg } : q)));
     }
   }
 
