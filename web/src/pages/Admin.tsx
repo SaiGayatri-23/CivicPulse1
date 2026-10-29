@@ -11,7 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { ActivityAdmin, AdsAdmin, AlertsAdmin, BusRoutesAdmin, ChildAlertsAdmin, ErrorsAdmin, InsightsAdmin, MissionsAdmin, ModerationAdmin, PeopleAdmin, PetitionsAdmin, RepliesAdmin, SupportAdmin } from './AdminMore';
 import { CLOSED_REASONS, EVENT_CATEGORIES, ISSUE_CATEGORIES, ISSUE_COLS, STATUS_CLASS, STATUS_LABEL, formatDate, formatEventTime, isOverdue, timeAgo } from '../lib/constants';
 import { photoUrl, signedDocUrl, supabase, uploadAdMedia, uploadPhoto } from '../lib/supabase';
-import type { CityEvent, ClosedReason, EventCategory, Helpline, Issue, IssueCategory, IssueStatus, UtilityLink } from '../lib/types';
+import type { CityEvent, ClosedReason, EventCategory, Helpline, Issue, IssueStatus, UtilityLink } from '../lib/types';
 import { friendlyError } from '../lib/friendlyError';
 
 // ISO timestamp -> value for <input type="datetime-local"> in the viewer's time zone.
@@ -197,75 +197,18 @@ function IssueQueue({ userId }: { userId: string }) {
   const items = queue.data ?? [];
   const overdue = items.filter(isOverdue).length;
 
-  // Tickets are shown per category (Water Supply, Roads, Street Lighting, ...) so the admin for
-  // one department sees one list. Chips at the top filter to a single category; "All" shows every
-  // category as its own section. Categories with nothing open are not shown.
-  const [cat, setCat] = useState<IssueCategory | 'all'>('all');
-  const [openId, setOpenId] = useState<string | null>(null);
-  const ORDER: IssueCategory[] = ['water', 'roads', 'lighting', 'waste', 'parks', 'other'];
-  const cats = ORDER.filter((c) => items.some((it) => it.category === c));
-  const groups = (cat === 'all' ? cats : cats.filter((c) => c === cat)).map((c) => ({ c, list: items.filter((it) => it.category === c) }));
-  const busy = update.isPending || claim.isPending || merge.isPending;
-  const card = (it: Issue) => (
-    <QueueCard key={it.id} it={it} me={userId} claim={claims.data?.get(it.id) ?? null} busy={busy}
-      onUpdate={(p) => update.mutate({ id: it.id, ...p })} onClaim={(take) => claim.mutate({ id: it.id, take })} onMerge={(ref) => merge.mutate({ id: it.id, ref })} />
-  );
-
   return (
-    <div className="space-y-5">
+    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 [&>p]:col-span-full">
       <p className="text-sm text-muted">
         {items.length} open · {overdue > 0 ? <span className="font-bold text-brick">{overdue} overdue</span> : 'none overdue'} ·{' '}
         <Link to="/scorecard" className="font-semibold text-primary hover:underline">Public scorecard</Link>
       </p>
-      {cats.length > 0 && (
-        <div className="flex flex-wrap gap-2" role="tablist" aria-label="Ticket category">
-          <button type="button" role="tab" aria-selected={cat === 'all'} className={`chip ${cat === 'all' ? 'chip-on' : ''}`} onClick={() => setCat('all')}>All · {items.length}</button>
-          {cats.map((c) => {
-            const n = items.filter((it) => it.category === c).length;
-            const late = items.filter((it) => it.category === c && isOverdue(it)).length;
-            return (
-              <button key={c} type="button" role="tab" aria-selected={cat === c} className={`chip ${cat === c ? 'chip-on' : ''}`} onClick={() => setCat(c)}>
-                {ISSUE_CATEGORIES[c]} · {n}{late > 0 && <span className="ml-1 text-brick">({late} overdue)</span>}
-              </button>
-            );
-          })}
-        </div>
-      )}
       {error && <p role="alert" className="text-sm font-semibold text-brick">{friendlyError(error)}</p>}
       {queue.isLoading && <p className="text-sm text-muted">Loading queue…</p>}
       {!queue.isLoading && items.length === 0 && <p className="card-flat border-dashed py-8 text-center text-sm text-muted">Nothing open. The queue is clear.</p>}
-      {groups.map(({ c, list }) => (
-        <section key={c} aria-labelledby={`cat-${c}`} className="space-y-3">
-          <h2 id={`cat-${c}`} className="flex items-center gap-2 border-b border-line pb-1 text-base font-semibold">
-            {ISSUE_CATEGORIES[c]} <span className="tag">{list.length}</span>
-            {list.filter(isOverdue).length > 0 && <span className="pill-overdue">{list.filter(isOverdue).length} overdue</span>}
-          </h2>
-          {/* One line per ticket. Clicking a line opens the full card underneath it for working the ticket. */}
-          <ul className="divide-y divide-line rounded-xl border border-line bg-card">
-            {list.map((it) => (
-              <li key={it.id}>
-                <button type="button" aria-expanded={openId === it.id} onClick={() => setOpenId(openId === it.id ? null : it.id)}
-                  className="grid w-full grid-cols-[3rem_1fr] items-center gap-3 px-3 py-2 text-left hover:bg-sand/60 sm:grid-cols-[3rem_7rem_1fr_9rem_8rem_7rem]">
-                  {it.photo_path
-                    ? <img src={photoUrl(it.photo_path) ?? undefined} alt="" loading="lazy" className="h-12 w-12 rounded-lg object-cover" />
-                    : <span className="h-12 w-12 rounded-lg bg-sand" />}
-                  <span className="font-mono text-[11px] font-semibold text-muted">{it.ref_no}</span>
-                  <span className="min-w-0">
-                    <span className="block truncate font-semibold">{it.title}</span>
-                    <span className="block truncate text-xs text-muted">{it.location_text} · {timeAgo(it.created_at)} · {it.upvote_count} backing</span>
-                  </span>
-                  <span className="flex flex-wrap items-center gap-1">
-                    <span className={STATUS_CLASS[it.status]}>{STATUS_LABEL[it.status]}</span>
-                    {isOverdue(it) && <span className="pill-overdue">Overdue</span>}
-                  </span>
-                  <span className="text-xs text-muted">{it.assignee ?? <span className="italic">No department</span>}</span>
-                  <span className="text-xs text-muted">{it.target_date ? formatDate(it.target_date) : ''}</span>
-                </button>
-                {openId === it.id && <div className="border-t border-line bg-sand/30 p-3">{card(it)}</div>}
-              </li>
-            ))}
-          </ul>
-        </section>
+      {items.map((it) => (
+        <QueueCard key={it.id} it={it} me={userId} claim={claims.data?.get(it.id) ?? null} busy={update.isPending || claim.isPending || merge.isPending}
+          onUpdate={(p) => update.mutate({ id: it.id, ...p })} onClaim={(take) => claim.mutate({ id: it.id, take })} onMerge={(ref) => merge.mutate({ id: it.id, ref })} />
       ))}
       <datalist id="departments">{DEPARTMENTS.map((d) => <option key={d} value={d} />)}</datalist>
     </div>
