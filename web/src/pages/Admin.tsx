@@ -11,7 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { ActivityAdmin, AdsAdmin, AlertsAdmin, BusRoutesAdmin, ChildAlertsAdmin, ErrorsAdmin, InsightsAdmin, MissionsAdmin, ModerationAdmin, PeopleAdmin, PetitionsAdmin, RepliesAdmin, SupportAdmin } from './AdminMore';
 import { CLOSED_REASONS, EVENT_CATEGORIES, ISSUE_CATEGORIES, ISSUE_COLS, STATUS_CLASS, STATUS_LABEL, formatDate, formatEventTime, isOverdue, timeAgo } from '../lib/constants';
 import { photoUrl, signedDocUrl, supabase, uploadAdMedia, uploadPhoto } from '../lib/supabase';
-import type { CityEvent, ClosedReason, EventCategory, Helpline, Issue, IssueStatus, UtilityLink } from '../lib/types';
+import type { CityEvent, ClosedReason, EventCategory, Helpline, Issue, IssueCategory, IssueStatus, UtilityLink } from '../lib/types';
 import { friendlyError } from '../lib/friendlyError';
 
 // ISO timestamp -> value for <input type="datetime-local"> in the viewer's time zone.
@@ -194,7 +194,12 @@ function IssueQueue({ userId }: { userId: string }) {
     onError: (e: Error) => setError(e.message),
   });
 
-  const items = queue.data ?? [];
+  const all = queue.data ?? [];
+  // Category filter: the grid stays as it is, the admin just picks which category to see.
+  const [cat, setCat] = useState<IssueCategory | 'all'>('all');
+  const ORDER: IssueCategory[] = ['water', 'roads', 'lighting', 'waste', 'parks', 'other'];
+  const cats = ORDER.filter((c) => all.some((it) => it.category === c));
+  const items = cat === 'all' ? all : all.filter((it) => it.category === cat);
   const overdue = items.filter(isOverdue).length;
 
   return (
@@ -203,6 +208,20 @@ function IssueQueue({ userId }: { userId: string }) {
         {items.length} open · {overdue > 0 ? <span className="font-bold text-brick">{overdue} overdue</span> : 'none overdue'} ·{' '}
         <Link to="/scorecard" className="font-semibold text-primary hover:underline">Public scorecard</Link>
       </p>
+      {cats.length > 0 && (
+        <div className="col-span-full flex flex-wrap gap-2" role="tablist" aria-label="Ticket category">
+          <button type="button" role="tab" aria-selected={cat === 'all'} className={`chip ${cat === 'all' ? 'chip-on' : ''}`} onClick={() => setCat('all')}>All · {all.length}</button>
+          {cats.map((c) => {
+            const n = all.filter((it) => it.category === c).length;
+            const late = all.filter((it) => it.category === c && isOverdue(it)).length;
+            return (
+              <button key={c} type="button" role="tab" aria-selected={cat === c} className={`chip ${cat === c ? 'chip-on' : ''}`} onClick={() => setCat(c)}>
+                {ISSUE_CATEGORIES[c]} · {n}{late > 0 && <span className="ml-1 text-brick">({late} overdue)</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
       {error && <p role="alert" className="text-sm font-semibold text-brick">{friendlyError(error)}</p>}
       {queue.isLoading && <p className="text-sm text-muted">Loading queue…</p>}
       {!queue.isLoading && items.length === 0 && <p className="card-flat border-dashed py-8 text-center text-sm text-muted">Nothing open. The queue is clear.</p>}
