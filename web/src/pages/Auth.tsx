@@ -5,7 +5,6 @@ import { Captcha, captchaEnabled, getCaptchaToken } from '../components/Captcha'
 import { AddressFields, useAddressFields } from '../components/AddressFields';
 import { useAuth } from '../hooks/useAuth';
 import { supabase, uploadPhoto } from '../lib/supabase';
-import { aadhaarLast4, isValidAadhaar } from '../lib/aadhaar';
 import { downscaleForAI } from '../lib/blur';
 import { ACCOUNT_TYPES, isOrg, validIndianMobile, type AccountType } from '../lib/accounts';
 
@@ -25,7 +24,6 @@ export function Auth() {
   const [phone, setPhone] = useState('');
   // Aadhaar at sign-up (individuals only): just the last 4 digits plus a photo of the masked card.
   // The full number is never asked for or stored.
-  const [aadhaarNo, setAadhaarNo] = useState('');
   const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
   const [aadhaarCheck, setAadhaarCheck] = useState<'idle' | 'checking' | 'ok'>('idle');
   const addr = useAddressFields();
@@ -116,10 +114,6 @@ export function Auth() {
     setNotice(null);
     if (mode === 'signup') {
       if (!validIndianMobile(phone)) { setError('Please enter a valid 10-digit Indian mobile number.'); return; }
-      if (!isOrg(accountType) && (aadhaarNo || aadhaarFile)) {
-        if (!isValidAadhaar(aadhaarNo)) { setError('That Aadhaar number is not valid. Check the 12 digits and try again.'); return; }
-        if (!aadhaarFile) { setError('Please upload a photo of your masked Aadhaar, or clear the Aadhaar digits.'); return; }
-      }
       if (!addr.valid()) { setError('Please fill in at least the street, area and city, and a 6-digit PIN code if given.'); return; }
       if (isOrg(accountType) && orgName.trim().length < 2) { setError(`Please enter the ${ACCOUNT_TYPES[accountType].orgLabel?.toLowerCase()}.`); return; }
     }
@@ -151,7 +145,7 @@ export function Auth() {
           const path = await uploadPhoto(data.user.id, aadhaarFile, 'id-docs');
           const { base64, mime } = await downscaleForAI(aadhaarFile);
           // The AI reads the card; if name and last 4 digits match, the account is Verified at once.
-          const { error: vErr } = await supabase.rpc('citizen_auto_verify', { p_image_base64: base64, p_mime: mime, p_last4: aadhaarLast4(aadhaarNo), p_doc_path: path });
+          const { error: vErr } = await supabase.rpc('citizen_auto_verify', { p_image_base64: base64, p_mime: mime, p_last4: null, p_doc_path: path });
           if (vErr) await supabase.storage.from('id-docs').remove([path]);
           refreshProfile();
         } catch { /* the profile page still offers verification if this upload failed */ }
@@ -224,22 +218,12 @@ export function Auth() {
             {!isOrg(accountType) && (
               <div className="space-y-2 rounded-xl border border-line p-3">
                 <p className="text-sm font-semibold">Aadhaar <span className="font-normal text-muted">(optional, for the Verified citizen badge)</span></p>
-                <div>
-                  <label className="label" htmlFor="aadhaar">Aadhaar number</label>
-                  <input id="aadhaar" className="input" inputMode="numeric" maxLength={14} placeholder="1234 5678 9012" autoComplete="off" value={aadhaarNo}
-                    onChange={(e) => { setAadhaarNo(e.target.value.replace(/[^0-9]/g, '').slice(0, 12).replace(/(\d{4})(?=\d)/g, '$1 ')); setAadhaarCheck('idle'); }} />
-                  {aadhaarNo.replace(/\s/g, '').length === 12 && (
-                    isValidAadhaar(aadhaarNo)
-                      ? <p className="mt-1 text-xs font-semibold text-ok">Valid Aadhaar number. Only the last 4 digits ({aadhaarLast4(aadhaarNo)}) will be saved.</p>
-                      : <p className="mt-1 text-xs font-semibold text-brick">This is not a valid Aadhaar number. Please check the digits.</p>
-                  )}
-                </div>
                 <div className="grid grid-cols-[1fr_auto] gap-2">
                   <label className="btn btn-ghost w-full cursor-pointer justify-center gap-2">
                     <Upload size={16} /> {aadhaarFile ? aadhaarFile.name.slice(0, 28) : 'Upload a photo of your masked Aadhaar'}
                     <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { setAadhaarFile(e.target.files?.[0] ?? null); setAadhaarCheck('idle'); }} />
                   </label>
-                  <button type="button" className="btn btn-primary" disabled={!aadhaarFile || !isValidAadhaar(aadhaarNo) || aadhaarCheck !== 'idle'}
+                  <button type="button" className="btn btn-primary" disabled={!aadhaarFile || aadhaarCheck !== 'idle'}
                     onClick={() => { setAadhaarCheck('checking'); window.setTimeout(() => setAadhaarCheck('ok'), 1200); }}>
                     {aadhaarCheck === 'checking' ? 'Verifying…' : 'Verify'}
                   </button>
@@ -247,10 +231,10 @@ export function Auth() {
                 {aadhaarCheck === 'ok' && (
                   <p role="status" className="flex items-start gap-1.5 rounded-lg bg-primary-soft px-3 py-2 text-xs font-semibold text-primary">
                     <BadgeCheck size={16} className="mt-0.5 shrink-0" aria-hidden />
-                    <span>Your Aadhaar is ready to be verified. When you create the account, the card is read automatically; if the name and last 4 digits match, you are marked a Verified citizen immediately. If it cannot be read, a CivicPulse admin checks it within a day.</span>
+                    <span>Your Aadhaar card is attached. When you create the account it is read automatically; if it is a masked Aadhaar and the name matches your account, you are marked a Verified citizen immediately. If it cannot be read, a CivicPulse admin checks it within a day.</span>
                   </p>
                 )}
-                <p className="text-[11px] text-muted">Use the <b>masked Aadhaar</b> (first 8 digits hidden), downloadable free from <a href="https://myaadhaar.uidai.gov.in/" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline">myaadhaar.uidai.gov.in</a>. The number is checked on your device and never sent to us; only its last 4 digits are kept. An admin compares them with the card and marks you Verified.</p>
+                <p className="text-[11px] text-muted">Use the <b>masked Aadhaar</b> (first 8 digits hidden), downloadable free from <a href="https://myaadhaar.uidai.gov.in/" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline">myaadhaar.uidai.gov.in</a>. The card is read automatically; only the last 4 digits printed on it are kept, never the full number.</p>
               </div>
             )}
             <AddressFields idPrefix="su" label={isOrg(accountType) ? 'Office address' : 'Address'} state={addr} />
