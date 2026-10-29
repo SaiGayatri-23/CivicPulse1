@@ -201,7 +201,8 @@ function IssueQueue({ userId }: { userId: string }) {
   // one department sees one list. Chips at the top filter to a single category; "All" shows every
   // category as its own section. Categories with nothing open are not shown.
   const [cat, setCat] = useState<IssueCategory | 'all'>('all');
-  const cats = (Object.keys(ISSUE_CATEGORIES) as IssueCategory[]).filter((c) => items.some((it) => it.category === c));
+  const ORDER: IssueCategory[] = ['water', 'roads', 'lighting', 'waste', 'parks', 'other'];
+  const cats = ORDER.filter((c) => items.some((it) => it.category === c));
   const groups = (cat === 'all' ? cats : cats.filter((c) => c === cat)).map((c) => ({ c, list: items.filter((it) => it.category === c) }));
   const busy = update.isPending || claim.isPending || merge.isPending;
   const card = (it: Issue) => (
@@ -238,7 +239,10 @@ function IssueQueue({ userId }: { userId: string }) {
             {ISSUE_CATEGORIES[c]} <span className="tag">{list.length}</span>
             {list.filter(isOverdue).length > 0 && <span className="pill-overdue">{list.filter(isOverdue).length} overdue</span>}
           </h2>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">{list.map(card)}</div>
+          {/* One line per category: cards sit side by side and the row scrolls sideways if needed. */}
+          <div className="flex snap-x gap-5 overflow-x-auto pb-3">
+            {list.map((it) => <div key={it.id} className="w-[22rem] shrink-0 snap-start">{card(it)}</div>)}
+          </div>
         </section>
       ))}
       <datalist id="departments">{DEPARTMENTS.map((d) => <option key={d} value={d} />)}</datalist>
