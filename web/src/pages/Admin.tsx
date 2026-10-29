@@ -201,6 +201,7 @@ function IssueQueue({ userId }: { userId: string }) {
   // one department sees one list. Chips at the top filter to a single category; "All" shows every
   // category as its own section. Categories with nothing open are not shown.
   const [cat, setCat] = useState<IssueCategory | 'all'>('all');
+  const [openId, setOpenId] = useState<string | null>(null);
   const ORDER: IssueCategory[] = ['water', 'roads', 'lighting', 'waste', 'parks', 'other'];
   const cats = ORDER.filter((c) => items.some((it) => it.category === c));
   const groups = (cat === 'all' ? cats : cats.filter((c) => c === cat)).map((c) => ({ c, list: items.filter((it) => it.category === c) }));
@@ -239,10 +240,31 @@ function IssueQueue({ userId }: { userId: string }) {
             {ISSUE_CATEGORIES[c]} <span className="tag">{list.length}</span>
             {list.filter(isOverdue).length > 0 && <span className="pill-overdue">{list.filter(isOverdue).length} overdue</span>}
           </h2>
-          {/* One line per category: cards sit side by side and the row scrolls sideways if needed. */}
-          <div className="flex snap-x gap-5 overflow-x-auto pb-3">
-            {list.map((it) => <div key={it.id} className="w-[22rem] shrink-0 snap-start">{card(it)}</div>)}
-          </div>
+          {/* One line per ticket. Clicking a line opens the full card underneath it for working the ticket. */}
+          <ul className="divide-y divide-line rounded-xl border border-line bg-card">
+            {list.map((it) => (
+              <li key={it.id}>
+                <button type="button" aria-expanded={openId === it.id} onClick={() => setOpenId(openId === it.id ? null : it.id)}
+                  className="grid w-full grid-cols-[3rem_1fr] items-center gap-3 px-3 py-2 text-left hover:bg-sand/60 sm:grid-cols-[3rem_7rem_1fr_9rem_8rem_7rem]">
+                  {it.photo_path
+                    ? <img src={photoUrl(it.photo_path) ?? undefined} alt="" loading="lazy" className="h-12 w-12 rounded-lg object-cover" />
+                    : <span className="h-12 w-12 rounded-lg bg-sand" />}
+                  <span className="font-mono text-[11px] font-semibold text-muted">{it.ref_no}</span>
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold">{it.title}</span>
+                    <span className="block truncate text-xs text-muted">{it.location_text} · {timeAgo(it.created_at)} · {it.upvote_count} backing</span>
+                  </span>
+                  <span className="flex flex-wrap items-center gap-1">
+                    <span className={STATUS_CLASS[it.status]}>{STATUS_LABEL[it.status]}</span>
+                    {isOverdue(it) && <span className="pill-overdue">Overdue</span>}
+                  </span>
+                  <span className="text-xs text-muted">{it.assignee ?? <span className="italic">No department</span>}</span>
+                  <span className="text-xs text-muted">{it.target_date ? formatDate(it.target_date) : ''}</span>
+                </button>
+                {openId === it.id && <div className="border-t border-line bg-sand/30 p-3">{card(it)}</div>}
+              </li>
+            ))}
+          </ul>
         </section>
       ))}
       <datalist id="departments">{DEPARTMENTS.map((d) => <option key={d} value={d} />)}</datalist>
